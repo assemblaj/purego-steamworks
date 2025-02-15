@@ -50,7 +50,7 @@ func initSteamFriends() {
 }
 
 func SteamInput() steamInput {
-	purego.RegisterLibFunc(steamInput_init, steam, flatAPI_SteamInput)
+	purego.RegisterLibFunc(&steamInput_init, steam, flatAPI_SteamInput)
 	return steamInput(steamInput_init())
 }
 
@@ -62,7 +62,7 @@ func initSteamInput() {
 }
 
 func SteamRemoteStorage() steamRemoteStorage {
-	purego.RegisterLibFunc(steamRemoteStorage_init, steam, flatAPI_SteamRemoteStorage)
+	purego.RegisterLibFunc(&steamRemoteStorage_init, steam, flatAPI_SteamRemoteStorage)
 	return steamRemoteStorage(steamRemoteStorage_init())
 }
 
@@ -74,7 +74,7 @@ func initSteamRemoteStorage() {
 }
 
 func SteamUser() steamUser {
-	purego.RegisterLibFunc(steamUser_init, steam, flatAPI_SteamUser)
+	purego.RegisterLibFunc(&steamUser_init, steam, flatAPI_SteamUser)
 	return steamUser(steamUser_init())
 }
 
@@ -83,23 +83,23 @@ func initSteamUser() {
 }
 
 func SteamUserStats() steamUserStats {
-	purego.RegisterLibFunc(steamUserStats_init, steam, flatAPI_SteamUserStats)
+	purego.RegisterLibFunc(&steamUserStats_init, steam, flatAPI_SteamUserStats)
 	return steamUserStats(steamUserStats_init())
 }
 
 func initSteamUserStats() {
-	purego.RegisterLibFunc(getAchievement, steam, flatAPI_ISteamUserStats_GetAchievement)
-	purego.RegisterLibFunc(setAchievement, steam, flatAPI_ISteamUserStats_SetAchievement)
-	purego.RegisterLibFunc(clearAchievement, steam, flatAPI_ISteamUserStats_ClearAchievement)
-	purego.RegisterLibFunc(storeStats, steam, flatAPI_ISteamUserStats_StoreStats)
+	purego.RegisterLibFunc(&getAchievement, steam, flatAPI_ISteamUserStats_GetAchievement)
+	purego.RegisterLibFunc(&setAchievement, steam, flatAPI_ISteamUserStats_SetAchievement)
+	purego.RegisterLibFunc(&clearAchievement, steam, flatAPI_ISteamUserStats_ClearAchievement)
+	purego.RegisterLibFunc(&storeStats, steam, flatAPI_ISteamUserStats_StoreStats)
 }
 
 func SteamUtils() steamUtils {
-	purego.RegisterLibFunc(steamUitils_init, steam, flatAPI_SteamUtils)
+	purego.RegisterLibFunc(&steamUitils_init, steam, flatAPI_SteamUtils)
 	return steamUtils(steamUitils_init())
 }
 
 func initSteamUtils() {
-	purego.RegisterLibFunc(isSteamRunningOnSteamDeck, steam, flatAPI_ISteamUtils_IsSteamRunningOnSteamDeck)
-	purego.RegisterLibFunc(showFloatingGamepadTextInput, steam, flatAPI_ISteamUtils_ShowFloatingGamepadTextInput)
+	purego.RegisterLibFunc(&isSteamRunningOnSteamDeck, steam, flatAPI_ISteamUtils_IsSteamRunningOnSteamDeck)
+	purego.RegisterLibFunc(&showFloatingGamepadTextInput, steam, flatAPI_ISteamUtils_ShowFloatingGamepadTextInput)
 }
