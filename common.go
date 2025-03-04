@@ -1,7 +1,6 @@
 package puregosteamworks
 
 import (
-	"fmt"
 	"unsafe"
 )
 
@@ -10,29 +9,10 @@ type CGameID uint64
 type Uint64SteamID uint64
 type Uint64GameID uint64
 
-var SteamAPIDLL uintptr
+var steamAPIDLL uintptr
 
 type SteamAPIWarningMessageHook string
 type SteamCallbackID uint64
-
-type CallResult[T Callback] struct {
-	Handle SteamAPICall
-}
-
-func (cr CallResult[T]) String() string {
-	var zero T
-	return fmt.Sprintf("%s API HANDLE: %d", zero, cr.Handle)
-}
-
-func CallbackString(callback Callback) string {
-	return fmt.Sprintf("Callback Type: %s, Callback ID: %d", callback.Name(), callback.CallbackID())
-}
-
-type Callback interface {
-	CallbackID() SteamCallbackID
-	Name() string
-	String() string
-}
 
 type lint64 int64
 type ulint64 uint64
@@ -275,14 +255,14 @@ type SteamAPICallCompleted struct {
 
 const SteamAPICallCompletedID SteamCallbackID = 703
 
-func UintptrToStruct[T any](ptr uintptr) *T {
+func uintptrToStruct[T any](ptr uintptr) *T {
 	if ptr == 0 {
 		return nil
 	}
 	return (*T)(unsafe.Pointer(ptr))
 }
 
-func StructToUintptr[T any](s *T) uintptr {
+func structToUintptr[T any](s *T) uintptr {
 	if s == nil {
 		return 0
 	}

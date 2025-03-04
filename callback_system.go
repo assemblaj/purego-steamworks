@@ -1,15 +1,30 @@
-package callback
+package puregosteamworks
 
 import (
 	"fmt"
 	"sync"
 	"time"
 	"unsafe"
-
-	. "github.com/assemblaj/purego-steamworks"
-
-	"github.com/ebitengine/purego"
 )
+
+type CallResult[T Callback] struct {
+	Handle SteamAPICall
+}
+
+func (cr CallResult[T]) String() string {
+	var zero T
+	return fmt.Sprintf("%s API HANDLE: %d", zero, cr.Handle)
+}
+
+func callbackString(callback Callback) string {
+	return fmt.Sprintf("Callback Type: %s, Callback ID: %d", callback.Name(), callback.CallbackID())
+}
+
+type Callback interface {
+	CallbackID() SteamCallbackID
+	Name() string
+	String() string
+}
 
 type callbackRegistry struct {
 	callbacks   map[SteamCallbackID]any
@@ -108,25 +123,16 @@ const (
 	flatAPI_ManualDispatch_GetAPICallResult = "SteamAPI_ManualDispatch_GetAPICallResult"
 )
 
-func init() {
-	purego.RegisterLibFunc(&getHSteamPipe, SteamAPIDLL, flatAPI_GetHSteamPipe)
-	purego.RegisterLibFunc(&manualdispatch_init, SteamAPIDLL, flatAPI_ManualDispatch_Init)
-	purego.RegisterLibFunc(&manualdispatch_runFrame, SteamAPIDLL, flatAPI_ManualDispatch_RunFrame)
-	purego.RegisterLibFunc(&manualdispatch_getNextCallback, SteamAPIDLL, flatAPI_ManualDispatch_GetNextCallback)
-	purego.RegisterLibFunc(&manualdispatch_freeLastCallback, SteamAPIDLL, flatAPI_ManualDispatch_FreeLastCallback)
-	purego.RegisterLibFunc(&manualdispatch_getApiCallResult, SteamAPIDLL, flatAPI_ManualDispatch_GetAPICallResult)
-}
-
 var once sync.Once
 
-func DoForever() {
+func RunCallbacksForever() {
 	for {
-		Do()
+		RunCallbacks()
 		time.Sleep(time.Duration(100 * time.Millisecond))
 	}
 }
 
-func Do() {
+func RunCallbacks() {
 	once.Do(func() {
 		manualdispatch_init()
 	})
