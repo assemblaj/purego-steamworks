@@ -57,30 +57,30 @@ var (
 	iSteamApps_BIsVACBanned                   func(steamApps uintptr) bool
 	iSteamApps_GetCurrentGameLanguage         func(steamApps uintptr) string
 	iSteamApps_GetAvailableGameLanguages      func(steamApps uintptr) string
-	iSteamApps_BIsSubscribedApp               func(steamApps uintptr, appID AppId) bool
-	iSteamApps_BIsDlcInstalled                func(steamApps uintptr, appID AppId) bool
-	iSteamApps_GetEarliestPurchaseUnixTime    func(steamApps uintptr, appID AppId) uint32
+	iSteamApps_BIsSubscribedApp               func(steamApps uintptr, appID AppId_t) bool
+	iSteamApps_BIsDlcInstalled                func(steamApps uintptr, appID AppId_t) bool
+	iSteamApps_GetEarliestPurchaseUnixTime    func(steamApps uintptr, appID AppId_t) uint32
 	iSteamApps_BIsSubscribedFromFreeWeekend   func(steamApps uintptr) bool
 	iSteamApps_GetDLCCount                    func(steamApps uintptr) int32
-	iSteamApps_BGetDLCDataByIndex             func(steamApps uintptr, dlcIndex int32, appID *AppId, available *bool, name []byte, nameBufferSize int32) bool
-	iSteamApps_InstallDLC                     func(steamApps uintptr, appID AppId)
-	iSteamApps_UninstallDLC                   func(steamApps uintptr, appID AppId)
-	iSteamApps_RequestAppProofOfPurchaseKey   func(steamApps uintptr, appID AppId)
+	iSteamApps_BGetDLCDataByIndex             func(steamApps uintptr, dlcIndex int32, appID *AppId_t, available *bool, name []byte, nameBufferSize int32) bool
+	iSteamApps_InstallDLC                     func(steamApps uintptr, appID AppId_t)
+	iSteamApps_UninstallDLC                   func(steamApps uintptr, appID AppId_t)
+	iSteamApps_RequestAppProofOfPurchaseKey   func(steamApps uintptr, appID AppId_t)
 	iSteamApps_GetCurrentBetaName             func(steamApps uintptr, name []byte, nameBufferSize int32) bool
 	iSteamApps_MarkContentCorrupt             func(steamApps uintptr, missingFilesOnly bool) bool
-	iSteamApps_GetInstalledDepots             func(steamApps uintptr, appID AppId, depots []DepotId, maxDepots uint32) uint32
-	iSteamApps_GetAppInstallDir               func(steamApps uintptr, appID AppId, folder []byte, folderBufferSize uint32) uint32
-	iSteamApps_BIsAppInstalled                func(steamApps uintptr, appID AppId) bool
+	iSteamApps_GetInstalledDepots             func(steamApps uintptr, appID AppId_t, depots []DepotId, maxDepots uint32) uint32
+	iSteamApps_GetAppInstallDir               func(steamApps uintptr, appID AppId_t, folder []byte, folderBufferSize uint32) uint32
+	iSteamApps_BIsAppInstalled                func(steamApps uintptr, appID AppId_t) bool
 	iSteamApps_GetAppOwner                    func(steamApps uintptr) Uint64SteamID
 	iSteamApps_GetLaunchQueryParam            func(steamApps uintptr, key string) string
-	iSteamApps_GetDlcDownloadProgress         func(steamApps uintptr, appID AppId, bytesDownloaded *uint64, bytesTotal *uint64) bool
+	iSteamApps_GetDlcDownloadProgress         func(steamApps uintptr, appID AppId_t, bytesDownloaded *uint64, bytesTotal *uint64) bool
 	iSteamApps_GetAppBuildId                  func(steamApps uintptr) int32
 	iSteamApps_RequestAllProofOfPurchaseKeys  func(steamApps uintptr)
 	iSteamApps_GetFileDetails                 func(steamApps uintptr, pszFileName string) SteamAPICall
 	iSteamApps_GetLaunchCommandLine           func(steamApps uintptr, pszCommandLine []byte, commandLineStringSize int32) int32
 	iSteamApps_BIsSubscribedFromFamilySharing func(steamApps uintptr) bool
 	iSteamApps_BIsTimedTrial                  func(steamApps uintptr, secondsAllowed *uint32, secondsPlayed *uint32) bool
-	iSteamApps_SetDlcContext                  func(steamApps uintptr, appID AppId) bool
+	iSteamApps_SetDlcContext                  func(steamApps uintptr, appID AppId_t) bool
 	iSteamApps_GetNumBetas                    func(steamApps uintptr, available *int32, private *int32) int32
 	iSteamApps_GetBetaInfo                    func(steamApps uintptr, betaIndex int32, punFlags *uint32, punBuildID *uint32, pchBetaName []byte, cchBetaName int32, pchDescription []byte, cchDescription int32) bool
 	iSteamApps_SetActiveBeta                  func(steamApps uintptr, pchBetaName string) bool
@@ -88,7 +88,7 @@ var (
 
 type steamApps uintptr
 
-func SteamApps() steamApps {
+func SteamApps() ISteamApps {
 	return steamApps(steamApps_init())
 }
 
@@ -117,15 +117,15 @@ func (s steamApps) GetAvailableGameLanguages() []string {
 	return strings.Split(langs, ",")
 }
 
-func (s steamApps) BIsSubscribedApp(appID AppId) bool {
+func (s steamApps) BIsSubscribedApp(appID AppId_t) bool {
 	return iSteamApps_BIsSubscribedApp(uintptr(s), appID)
 }
 
-func (s steamApps) BIsDlcInstalled(appID AppId) bool {
+func (s steamApps) BIsDlcInstalled(appID AppId_t) bool {
 	return iSteamApps_BIsDlcInstalled(uintptr(s), appID)
 }
 
-func (s steamApps) GetEarliestPurchaseUnixTime(appID AppId) uint32 {
+func (s steamApps) GetEarliestPurchaseUnixTime(appID AppId_t) uint32 {
 	return iSteamApps_GetEarliestPurchaseUnixTime(uintptr(s), appID)
 }
 
@@ -137,21 +137,21 @@ func (s steamApps) GetDLCCount() int32 {
 	return iSteamApps_GetDLCCount(uintptr(s))
 }
 
-func (s steamApps) BGetDLCDataByIndex(dlcIndex int32) (appID AppId, available bool, name string, success bool) {
+func (s steamApps) BGetDLCDataByIndex(dlcIndex int32) (appID AppId_t, available bool, name string, success bool) {
 	var nameBuf []byte = make([]byte, 0, 4096)
 	result := iSteamApps_BGetDLCDataByIndex(uintptr(s), dlcIndex, &appID, &available, nameBuf, int32(len(name)))
 	return appID, available, string(nameBuf), result
 }
 
-func (s steamApps) InstallDLC(appID AppId) {
+func (s steamApps) InstallDLC(appID AppId_t) {
 	iSteamApps_InstallDLC(uintptr(s), appID)
 }
 
-func (s steamApps) UninstallDLC(appID AppId) {
+func (s steamApps) UninstallDLC(appID AppId_t) {
 	iSteamApps_UninstallDLC(uintptr(s), appID)
 }
 
-func (s steamApps) RequestAppProofOfPurchaseKey(appID AppId) {
+func (s steamApps) RequestAppProofOfPurchaseKey(appID AppId_t) {
 	iSteamApps_RequestAppProofOfPurchaseKey(uintptr(s), appID)
 }
 
@@ -166,20 +166,20 @@ func (s steamApps) MarkContentCorrupt(missingFilesOnly bool) bool {
 	return iSteamApps_MarkContentCorrupt(uintptr(s), missingFilesOnly)
 }
 
-func (s steamApps) GetInstalledDepots(appID AppId, maxDepots uint32) []DepotId {
+func (s steamApps) GetInstalledDepots(appID AppId_t, maxDepots uint32) []DepotId {
 	var depots []DepotId = make([]DepotId, 0, maxDepots)
 	result := iSteamApps_GetInstalledDepots(uintptr(s), appID, depots, maxDepots)
 	return depots[:result]
 }
 
-func (s steamApps) GetAppInstallDir(appID AppId) string {
+func (s steamApps) GetAppInstallDir(appID AppId_t) string {
 	var folderBufferSize uint32 = 4096
 	folder := make([]byte, 0, folderBufferSize)
 	total := iSteamApps_GetAppInstallDir(uintptr(s), appID, folder, folderBufferSize)
 	return string(folder[:total])
 }
 
-func (s steamApps) BIsAppInstalled(appID AppId) bool {
+func (s steamApps) BIsAppInstalled(appID AppId_t) bool {
 	return iSteamApps_BIsAppInstalled(uintptr(s), appID)
 }
 
@@ -191,7 +191,7 @@ func (s steamApps) GetLaunchQueryParam(key string) string {
 	return iSteamApps_GetLaunchQueryParam(uintptr(s), key)
 }
 
-func (s steamApps) GetDlcDownloadProgress(appID AppId) (bytesDownloaded uint64, bytesTotal uint64, success bool) {
+func (s steamApps) GetDlcDownloadProgress(appID AppId_t) (bytesDownloaded uint64, bytesTotal uint64, success bool) {
 	success = iSteamApps_GetDlcDownloadProgress(uintptr(s), appID, &bytesDownloaded, &bytesTotal)
 	return bytesDownloaded, bytesTotal, success
 }
@@ -225,7 +225,7 @@ func (s steamApps) BIsTimedTrial() (inTimeTrial bool, secondsAllowed uint32, sec
 	return inTimeTrial, secondsAllowed, secondsPlayed
 }
 
-func (s steamApps) SetDlcContext(appID AppId) bool {
+func (s steamApps) SetDlcContext(appID AppId_t) bool {
 	return iSteamApps_SetDlcContext(uintptr(s), appID)
 }
 
@@ -262,61 +262,61 @@ const (
 type EUserRestriction int32
 
 const (
-	UserRestrictionNone        EUserRestriction = 0
-	UserRestrictionUnknown     EUserRestriction = 1
-	UserRestrictionAnyChat     EUserRestriction = 2
-	UserRestrictionVoiceChat   EUserRestriction = 4
-	UserRestrictionGroupChat   EUserRestriction = 8
-	UserRestrictionRating      EUserRestriction = 16
-	UserRestrictionGameInvites EUserRestriction = 32
-	UserRestrictionTrading     EUserRestriction = 64
+	UserRestriction_None        EUserRestriction = 0
+	UserRestriction_Unknown     EUserRestriction = 1
+	UserRestriction_AnyChat     EUserRestriction = 2
+	UserRestriction_VoiceChat   EUserRestriction = 4
+	UserRestriction_GroupChat   EUserRestriction = 8
+	UserRestriction_Rating      EUserRestriction = 16
+	UserRestriction_GameInvites EUserRestriction = 32
+	UserRestriction_Trading     EUserRestriction = 64
 )
 
 type ECommunityProfileItemType int32
 
 const (
-	ECommunityProfileItemTypeAnimatedAvatar        ECommunityProfileItemType = 0
-	ECommunityProfileItemTypeAvatarFrame           ECommunityProfileItemType = 1
-	ECommunityProfileItemTypeProfileModifier       ECommunityProfileItemType = 2
-	ECommunityProfileItemTypeProfileBackground     ECommunityProfileItemType = 3
-	ECommunityProfileItemTypeMiniProfileBackground ECommunityProfileItemType = 4
+	ECommunityProfileItemType_AnimatedAvatar        ECommunityProfileItemType = 0
+	ECommunityProfileItemType_AvatarFrame           ECommunityProfileItemType = 1
+	ECommunityProfileItemType_ProfileModifier       ECommunityProfileItemType = 2
+	ECommunityProfileItemType_ProfileBackground     ECommunityProfileItemType = 3
+	ECommunityProfileItemType_MiniProfileBackground ECommunityProfileItemType = 4
 )
 
 type ECommunityProfileItemProperty int32
 
 const (
-	ECommunityProfileItemPropertyImageSmall     ECommunityProfileItemProperty = 0
-	ECommunityProfileItemPropertyImageLarge     ECommunityProfileItemProperty = 1
-	ECommunityProfileItemPropertyInternalName   ECommunityProfileItemProperty = 2
-	ECommunityProfileItemPropertyTitle          ECommunityProfileItemProperty = 3
-	ECommunityProfileItemPropertyDescription    ECommunityProfileItemProperty = 4
-	ECommunityProfileItemPropertyAppID          ECommunityProfileItemProperty = 5
-	ECommunityProfileItemPropertyTypeID         ECommunityProfileItemProperty = 6
-	ECommunityProfileItemPropertyClass          ECommunityProfileItemProperty = 7
-	ECommunityProfileItemPropertyMovieWebM      ECommunityProfileItemProperty = 8
-	ECommunityProfileItemPropertyMovieMP4       ECommunityProfileItemProperty = 9
-	ECommunityProfileItemPropertyMovieWebMSmall ECommunityProfileItemProperty = 10
-	ECommunityProfileItemPropertyMovieMP4Small  ECommunityProfileItemProperty = 11
+	ECommunityProfileItemProperty_ImageSmall     ECommunityProfileItemProperty = 0
+	ECommunityProfileItemProperty_ImageLarge     ECommunityProfileItemProperty = 1
+	ECommunityProfileItemProperty_InternalName   ECommunityProfileItemProperty = 2
+	ECommunityProfileItemProperty_Title          ECommunityProfileItemProperty = 3
+	ECommunityProfileItemProperty_Description    ECommunityProfileItemProperty = 4
+	ECommunityProfileItemProperty_AppID          ECommunityProfileItemProperty = 5
+	ECommunityProfileItemProperty_TypeID         ECommunityProfileItemProperty = 6
+	ECommunityProfileItemProperty_Class          ECommunityProfileItemProperty = 7
+	ECommunityProfileItemProperty_MovieWebM      ECommunityProfileItemProperty = 8
+	ECommunityProfileItemProperty_MovieMP4       ECommunityProfileItemProperty = 9
+	ECommunityProfileItemProperty_MovieWebMSmall ECommunityProfileItemProperty = 10
+	ECommunityProfileItemProperty_MovieMP4Small  ECommunityProfileItemProperty = 11
 )
 
 type EPersonaChange int32
 
 const (
-	EPersonaChangeName                EPersonaChange = 1
-	EPersonaChangeStatus              EPersonaChange = 2
-	EPersonaChangeComeOnline          EPersonaChange = 4
-	EPersonaChangeGoneOffline         EPersonaChange = 8
-	EPersonaChangeGamePlayed          EPersonaChange = 16
-	EPersonaChangeGameServer          EPersonaChange = 32
-	EPersonaChangeAvatar              EPersonaChange = 64
-	EPersonaChangeJoinedSource        EPersonaChange = 128
-	EPersonaChangeLeftSource          EPersonaChange = 256
-	EPersonaChangeRelationshipChanged EPersonaChange = 512
-	EPersonaChangeNameFirstSet        EPersonaChange = 1024
-	EPersonaChangeBroadcast           EPersonaChange = 2048
-	EPersonaChangeNickname            EPersonaChange = 4096
-	EPersonaChangeSteamLevel          EPersonaChange = 8192
-	EPersonaChangeRichPresence        EPersonaChange = 16384
+	EPersonaChange_Name                EPersonaChange = 1
+	EPersonaChange_Status              EPersonaChange = 2
+	EPersonaChange_ComeOnline          EPersonaChange = 4
+	EPersonaChange_GoneOffline         EPersonaChange = 8
+	EPersonaChange_GamePlayed          EPersonaChange = 16
+	EPersonaChange_GameServer          EPersonaChange = 32
+	EPersonaChange_Avatar              EPersonaChange = 64
+	EPersonaChange_JoinedSource        EPersonaChange = 128
+	EPersonaChange_LeftSource          EPersonaChange = 256
+	EPersonaChange_RelationshipChanged EPersonaChange = 512
+	EPersonaChange_NameFirstSet        EPersonaChange = 1024
+	EPersonaChange_Broadcast           EPersonaChange = 2048
+	EPersonaChange_Nickname            EPersonaChange = 4096
+	EPersonaChange_SteamLevel          EPersonaChange = 8192
+	EPersonaChange_RichPresence        EPersonaChange = 16384
 )
 
 type FriendsGroupID int16
@@ -326,67 +326,67 @@ type FriendGameInfo struct {
 	GameIP       uint32
 	GamePort     uint16
 	QueryPort    uint16
-	lobbySteamID CSteamID
+	LobbySteamID CSteamID
 }
 
 type EActivateGameOverlayToWebPageMode int32
 
 const (
-	EActivateGameOverlayToWebPageModeDefault EActivateGameOverlayToWebPageMode = 0
-	EActivateGameOverlayToWebPageModeModal   EActivateGameOverlayToWebPageMode = 1
+	EActivateGameOverlayToWebPageMode_Default EActivateGameOverlayToWebPageMode = 0
+	EActivateGameOverlayToWebPageMode_Modal   EActivateGameOverlayToWebPageMode = 1
 )
 
 type EOverlayToStoreFlag int32
 
 const (
-	EOverlayToStoreFlagNone             EOverlayToStoreFlag = 0
-	EOverlayToStoreFlagAddToCart        EOverlayToStoreFlag = 1
-	EOverlayToStoreFlagAddToCartAndShow EOverlayToStoreFlag = 2
+	EOverlayToStoreFlag_None             EOverlayToStoreFlag = 0
+	EOverlayToStoreFlag_AddToCart        EOverlayToStoreFlag = 1
+	EOverlayToStoreFlag_AddToCartAndShow EOverlayToStoreFlag = 2
 )
 
 type EFriendRelationship int32
 
 const (
-	EFriendRelationshipNone                EFriendRelationship = 0
-	EFriendRelationshipBlocked             EFriendRelationship = 1
-	EFriendRelationshipRequestRecipient    EFriendRelationship = 2
-	EFriendRelationshipFriend              EFriendRelationship = 3
-	EFriendRelationshipRequestInitiator    EFriendRelationship = 4
-	EFriendRelationshipIgnored             EFriendRelationship = 5
-	EFriendRelationshipIgnoredFriend       EFriendRelationship = 6
-	EFriendRelationshipSuggestedDEPRECATED EFriendRelationship = 7
-	EFriendRelationshipMax                 EFriendRelationship = 8
+	EFriendRelationship_None                EFriendRelationship = 0
+	EFriendRelationship_Blocked             EFriendRelationship = 1
+	EFriendRelationship_RequestRecipient    EFriendRelationship = 2
+	EFriendRelationship_Friend              EFriendRelationship = 3
+	EFriendRelationship_RequestInitiator    EFriendRelationship = 4
+	EFriendRelationship_Ignored             EFriendRelationship = 5
+	EFriendRelationship_IgnoredFriend       EFriendRelationship = 6
+	EFriendRelationship_SuggestedDEPRECATED EFriendRelationship = 7
+	EFriendRelationship_Max                 EFriendRelationship = 8
 )
 
 type EPersonaState int32
 
 const (
-	EPersonaStateOffline        EPersonaState = 0
-	EPersonaStateOnline         EPersonaState = 1
-	EPersonaStateBusy           EPersonaState = 2
-	EPersonaStateAway           EPersonaState = 3
-	EPersonaStateSnooze         EPersonaState = 4
-	EPersonaStateLookingToTrade EPersonaState = 5
-	EPersonaStateLookingToPlay  EPersonaState = 6
-	EPersonaStateInvisible      EPersonaState = 7
-	EPersonaStateMax            EPersonaState = 8
+	EPersonaState_Offline        EPersonaState = 0
+	EPersonaState_Online         EPersonaState = 1
+	EPersonaState_Busy           EPersonaState = 2
+	EPersonaState_Away           EPersonaState = 3
+	EPersonaState_Snooze         EPersonaState = 4
+	EPersonaState_LookingToTrade EPersonaState = 5
+	EPersonaState_LookingToPlay  EPersonaState = 6
+	EPersonaState_Invisible      EPersonaState = 7
+	EPersonaState_Max            EPersonaState = 8
 )
 
 type EFriendFlags int32
 
 const (
-	EFriendFlagNone                 EFriendFlags = 0
-	EFriendFlagBlocked              EFriendFlags = 1
-	EFriendFlagFriendshipRequested  EFriendFlags = 2
-	EFriendFlagImmediate            EFriendFlags = 4
-	EFriendFlagClanMember           EFriendFlags = 8
-	EFriendFlagOnGameServer         EFriendFlags = 16
-	EFriendFlagRequestingFriendship EFriendFlags = 128
-	EFriendFlagRequestingInfo       EFriendFlags = 256
-	EFriendFlagIgnored              EFriendFlags = 512
-	EFriendFlagIgnoredFriend        EFriendFlags = 1024
-	EFriendFlagChatMember           EFriendFlags = 4096
-	EFriendFlagAll                  EFriendFlags = 65535
+	EFriendFlag_None                 EFriendFlags = 0
+	EFriendFlag_Blocked              EFriendFlags = 1
+	EFriendFlag_FriendshipRequested  EFriendFlags = 2
+	EFriendFlag_Immediate            EFriendFlags = 4
+	EFriendFlag_ClanMember           EFriendFlags = 8
+	EFriendFlag_OnGameServer         EFriendFlags = 16
+	EFriendFlag_RequestingFriendship EFriendFlags = 128
+	EFriendFlag_RequestingInfo       EFriendFlags = 256
+	EFriendFlag_Ignored              EFriendFlags = 512
+	EFriendFlag_IgnoredFriend        EFriendFlags = 1024
+	EFriendFlag_ChatMember           EFriendFlags = 4096
+	EFriendFlag_All                  EFriendFlags = 65535
 )
 
 const (
@@ -504,7 +504,7 @@ var (
 	iSteamFriends_ActivateGameOverlay                               func(steamFriends uintptr, pchDialog string)
 	iSteamFriends_ActivateGameOverlayToUser                         func(steamFriends uintptr, pchDialog string, steamID Uint64SteamID)
 	iSteamFriends_ActivateGameOverlayToWebPage                      func(steamFriends uintptr, pchURL string, eMode EActivateGameOverlayToWebPageMode)
-	iSteamFriends_ActivateGameOverlayToStore                        func(steamFriends uintptr, nAppID AppId, eFlag EOverlayToStoreFlag)
+	iSteamFriends_ActivateGameOverlayToStore                        func(steamFriends uintptr, nAppID AppId_t, eFlag EOverlayToStoreFlag)
 	iSteamFriends_SetPlayedWith                                     func(steamFriends uintptr, userSteamIDPlayedWith Uint64SteamID)
 	iSteamFriends_ActivateGameOverlayInviteDialog                   func(steamFriends uintptr, lobbySteamID Uint64SteamID)
 	iSteamFriends_GetSmallFriendAvatar                              func(steamFriends uintptr, friendSteamID Uint64SteamID) int32
@@ -526,7 +526,7 @@ var (
 	iSteamFriends_GetCoplayFriendCount                              func(steamFriends uintptr) int32
 	iSteamFriends_GetCoplayFriend                                   func(steamFriends uintptr, iCoplayFriend int32) Uint64SteamID
 	iSteamFriends_GetFriendCoplayTime                               func(steamFriends uintptr, friendSteamID Uint64SteamID) int32
-	iSteamFriends_GetFriendCoplayGame                               func(steamFriends uintptr, friendSteamID Uint64SteamID) AppId
+	iSteamFriends_GetFriendCoplayGame                               func(steamFriends uintptr, friendSteamID Uint64SteamID) AppId_t
 	iSteamFriends_JoinClanChatRoom                                  func(steamFriends uintptr, clanSteamID Uint64SteamID) SteamAPICall
 	iSteamFriends_LeaveClanChatRoom                                 func(steamFriends uintptr, clanSteamID Uint64SteamID) bool
 	iSteamFriends_GetClanChatMemberCount                            func(steamFriends uintptr, clanSteamID Uint64SteamID) int32
@@ -557,7 +557,7 @@ var (
 
 type steamFriends uintptr
 
-func SteamFriends() steamFriends {
+func SteamFriends() ISteamFriends {
 	return steamFriends(steamFriends_init())
 }
 func (s steamFriends) GetPersonaName() string {
@@ -690,7 +690,7 @@ func (s steamFriends) ActivateGameOverlayToWebPage(URL string, mode EActivateGam
 	iSteamFriends_ActivateGameOverlayToWebPage(uintptr(s), URL, mode)
 }
 
-func (s steamFriends) ActivateGameOverlayToStore(appID AppId, flag EOverlayToStoreFlag) {
+func (s steamFriends) ActivateGameOverlayToStore(appID AppId_t, flag EOverlayToStoreFlag) {
 	iSteamFriends_ActivateGameOverlayToStore(uintptr(s), appID, flag)
 }
 
@@ -779,7 +779,7 @@ func (s steamFriends) GetFriendCoplayTime(friendSteamID Uint64SteamID) int32 {
 	return iSteamFriends_GetFriendCoplayTime(uintptr(s), friendSteamID)
 }
 
-func (s steamFriends) GetFriendCoplayGame(friendSteamID Uint64SteamID) AppId {
+func (s steamFriends) GetFriendCoplayGame(friendSteamID Uint64SteamID) AppId_t {
 	return iSteamFriends_GetFriendCoplayGame(uintptr(s), friendSteamID)
 }
 
@@ -901,18 +901,18 @@ func (s steamFriends) GetProfileItemPropertyUint(steamID Uint64SteamID, itemType
 type EAccountType int32
 
 const (
-	EAccountTypeInvalid        EAccountType = 0
-	EAccountTypeIndividual     EAccountType = 1
-	EAccountTypeMultiseat      EAccountType = 2
-	EAccountTypeGameServer     EAccountType = 3
-	EAccountTypeAnonGameServer EAccountType = 4
-	EAccountTypePending        EAccountType = 5
-	EAccountTypeContentServer  EAccountType = 6
-	EAccountTypeClan           EAccountType = 7
-	EAccountTypeChat           EAccountType = 8
-	EAccountTypeConsoleUser    EAccountType = 9
-	EAccountTypeAnonUser       EAccountType = 10
-	EAccountTypeMax            EAccountType = 11
+	EAccountType_Invalid        EAccountType = 0
+	EAccountType_Individual     EAccountType = 1
+	EAccountType_Multiseat      EAccountType = 2
+	EAccountType_GameServer     EAccountType = 3
+	EAccountType_AnonGameServer EAccountType = 4
+	EAccountType_Pending        EAccountType = 5
+	EAccountType_ContentServer  EAccountType = 6
+	EAccountType_Clan           EAccountType = 7
+	EAccountType_Chat           EAccountType = 8
+	EAccountType_ConsoleUser    EAccountType = 9
+	EAccountType_AnonUser       EAccountType = 10
+	EAccountType_Max            EAccountType = 11
 )
 
 var (
@@ -979,7 +979,7 @@ const (
 
 type steamClient uintptr
 
-func SteamClient() steamClient {
+func SteamClient() ISteamClient {
 	var Zero steamClient
 	return Zero
 }
@@ -1041,25 +1041,25 @@ const (
 type EPlayerResult int32
 
 const (
-	EPlayerResultFailedToConnect EPlayerResult = 1
-	EPlayerResultAbandoned       EPlayerResult = 2
-	EPlayerResultKicked          EPlayerResult = 3
-	EPlayerResultIncomplete      EPlayerResult = 4
-	EPlayerResultCompleted       EPlayerResult = 5
+	EPlayerResult_FailedToConnect EPlayerResult = 1
+	EPlayerResult_Abandoned       EPlayerResult = 2
+	EPlayerResult_Kicked          EPlayerResult = 3
+	EPlayerResult_Incomplete      EPlayerResult = 4
+	EPlayerResult_Completed       EPlayerResult = 5
 )
 
 type EGameSearchErrorCode int32
 
 const (
-	EGameSearchErrorCodeOK                            EGameSearchErrorCode = 1
-	EGameSearchErrorCodeFailedSearchAlreadyInProgress EGameSearchErrorCode = 2
-	EGameSearchErrorCodeFailedNoSearchInProgress      EGameSearchErrorCode = 3
-	EGameSearchErrorCodeFailedNotLobbyLeader          EGameSearchErrorCode = 4
-	EGameSearchErrorCodeFailedNoHostAvailable         EGameSearchErrorCode = 5
-	EGameSearchErrorCodeFailedSearchParamsInvalid     EGameSearchErrorCode = 6
-	EGameSearchErrorCodeFailedOffline                 EGameSearchErrorCode = 7
-	EGameSearchErrorCodeFailedNotAuthorized           EGameSearchErrorCode = 8
-	EGameSearchErrorCodeFailedUnknownError            EGameSearchErrorCode = 9
+	EGameSearchErrorCode_OK                            EGameSearchErrorCode = 1
+	EGameSearchErrorCode_FailedSearchAlreadyInProgress EGameSearchErrorCode = 2
+	EGameSearchErrorCode_FailedNoSearchInProgress      EGameSearchErrorCode = 3
+	EGameSearchErrorCode_FailedNotLobbyLeader          EGameSearchErrorCode = 4
+	EGameSearchErrorCode_FailedNoHostAvailable         EGameSearchErrorCode = 5
+	EGameSearchErrorCode_FailedSearchParamsInvalid     EGameSearchErrorCode = 6
+	EGameSearchErrorCode_FailedOffline                 EGameSearchErrorCode = 7
+	EGameSearchErrorCode_FailedNotAuthorized           EGameSearchErrorCode = 8
+	EGameSearchErrorCode_FailedUnknownError            EGameSearchErrorCode = 9
 )
 
 var (
@@ -1082,7 +1082,7 @@ var (
 
 type steamGameSearch uintptr
 
-func SteamGameSearch() steamGameSearch {
+func SteamGameSearch() ISteamGameSearch {
 	return steamGameSearch(steamGameSearch_init())
 }
 
@@ -1221,7 +1221,7 @@ var (
 	iSteamGameServer_BeginAuthSession                    func(steamGameServer uintptr, authTicket []byte, cbAuthTicket int32, steamID Uint64SteamID) EBeginAuthSessionResult
 	iSteamGameServer_EndAuthSession                      func(steamGameServer uintptr, steamID Uint64SteamID)
 	iSteamGameServer_CancelAuthTicket                    func(steamGameServer uintptr, hAuthTicket HAuthTicket)
-	iSteamGameServer_UserHasLicenseForApp                func(steamGameServer uintptr, steamID Uint64SteamID, AppId AppId) EUserHasLicenseForAppResult
+	iSteamGameServer_UserHasLicenseForApp                func(steamGameServer uintptr, steamID Uint64SteamID, AppId AppId_t) EUserHasLicenseForAppResult
 	iSteamGameServer_RequestUserGroupStatus              func(steamGameServer uintptr, user Uint64SteamID, groupSteamID Uint64SteamID) bool
 	iSteamGameServer_GetPublicIP                         func(steamGameServer uintptr) uintptr
 	iSteamGameServer_HandleIncomingPacket                func(steamGameServer uintptr, pData []byte, data int32, srcIP uint32, srcPort uint16) bool
@@ -1234,7 +1234,7 @@ var (
 
 type steamGameServer uintptr
 
-func SteamGameServer() steamGameServer {
+func SteamGameServer() ISteamGameServer {
 	GameServerActive = true
 	return steamGameServer(steamGameServer_init())
 }
@@ -1355,7 +1355,7 @@ func (s steamGameServer) CancelAuthTicket(authTicket HAuthTicket) {
 	iSteamGameServer_CancelAuthTicket(uintptr(s), authTicket)
 }
 
-func (s steamGameServer) UserHasLicenseForApp(steamID Uint64SteamID, AppId AppId) EUserHasLicenseForAppResult {
+func (s steamGameServer) UserHasLicenseForApp(steamID Uint64SteamID, AppId AppId_t) EUserHasLicenseForAppResult {
 	return iSteamGameServer_UserHasLicenseForApp(uintptr(s), steamID, AppId)
 }
 
@@ -1429,7 +1429,7 @@ const (
 
 type steamGameServerStats uintptr
 
-func SteamGameServerStats() steamGameServerStats {
+func SteamGameServerStats() ISteamGameServerStats {
 	return steamGameServerStats(steamGameServerStats_init())
 }
 
@@ -1482,15 +1482,11 @@ func (s steamGameServerStats) StoreUserStats(userSteamID Uint64SteamID) CallResu
 }
 
 // Steam Input
-const STEAM_INPUT_MAX_COUNT = 16
+const _STEAM_INPUT_MAX_COUNT = 16
 
-const STEAM_INPUT_MAX_ANALOG_ACTIONS = 24
+const _STEAM_INPUT_MAX_ORIGINS = 8
 
-const STEAM_INPUT_MAX_DIGITAL_ACTIONS = 256
-
-const STEAM_INPUT_MAX_ORIGINS = 8
-
-const STEAM_INPUT_MAX_ACTIVE_LAYERS = 16
+const _STEAM_INPUT_MAX_ACTIVE_LAYERS = 16
 
 type ESteamControllerPad int32
 
@@ -1500,7 +1496,7 @@ const (
 )
 
 type SteamInputActionEvent struct {
-	ControllerHandle InputHandle
+	ControllerHandle InputHandle_t
 	EventType        ESteamInputActionEventType
 	Action           [unsafe.Sizeof(DigitalAction{})]byte
 }
@@ -1527,57 +1523,57 @@ type InputMotionData struct {
 type EInputSourceMode int32
 
 const (
-	EInputSourceModeNone           EInputSourceMode = 0
-	EInputSourceModeDpad           EInputSourceMode = 1
-	EInputSourceModeButtons        EInputSourceMode = 2
-	EInputSourceModeFourButtons    EInputSourceMode = 3
-	EInputSourceModeAbsoluteMouse  EInputSourceMode = 4
-	EInputSourceModeRelativeMouse  EInputSourceMode = 5
-	EInputSourceModeJoystickMove   EInputSourceMode = 6
-	EInputSourceModeJoystickMouse  EInputSourceMode = 7
-	EInputSourceModeJoystickCamera EInputSourceMode = 8
-	EInputSourceModeScrollWheel    EInputSourceMode = 9
-	EInputSourceModeTrigger        EInputSourceMode = 10
-	EInputSourceModeTouchMenu      EInputSourceMode = 11
-	EInputSourceModeMouseJoystick  EInputSourceMode = 12
-	EInputSourceModeMouseRegion    EInputSourceMode = 13
-	EInputSourceModeRadialMenu     EInputSourceMode = 14
-	EInputSourceModeSingleButton   EInputSourceMode = 15
-	EInputSourceModeSwitches       EInputSourceMode = 16
+	EInputSourceMode_None           EInputSourceMode = 0
+	EInputSourceMode_Dpad           EInputSourceMode = 1
+	EInputSourceMode_Buttons        EInputSourceMode = 2
+	EInputSourceMode_FourButtons    EInputSourceMode = 3
+	EInputSourceMode_AbsoluteMouse  EInputSourceMode = 4
+	EInputSourceMode_RelativeMouse  EInputSourceMode = 5
+	EInputSourceMode_JoystickMove   EInputSourceMode = 6
+	EInputSourceMode_JoystickMouse  EInputSourceMode = 7
+	EInputSourceMode_JoystickCamera EInputSourceMode = 8
+	EInputSourceMode_ScrollWheel    EInputSourceMode = 9
+	EInputSourceMode_Trigger        EInputSourceMode = 10
+	EInputSourceMode_TouchMenu      EInputSourceMode = 11
+	EInputSourceMode_MouseJoystick  EInputSourceMode = 12
+	EInputSourceMode_MouseRegion    EInputSourceMode = 13
+	EInputSourceMode_RadialMenu     EInputSourceMode = 14
+	EInputSourceMode_SingleButton   EInputSourceMode = 15
+	EInputSourceMode_Switches       EInputSourceMode = 16
 )
 
 type EXboxOrigin int32
 
 const (
-	EXboxOriginA                   EXboxOrigin = 0
-	EXboxOriginB                   EXboxOrigin = 1
-	EXboxOriginX                   EXboxOrigin = 2
-	EXboxOriginY                   EXboxOrigin = 3
-	EXboxOriginLeftBumper          EXboxOrigin = 4
-	EXboxOriginRightBumper         EXboxOrigin = 5
-	EXboxOriginMenu                EXboxOrigin = 6
-	EXboxOriginView                EXboxOrigin = 7
-	EXboxOriginLeftTriggerPull     EXboxOrigin = 8
-	EXboxOriginLeftTriggerClick    EXboxOrigin = 9
-	EXboxOriginRightTriggerPull    EXboxOrigin = 10
-	EXboxOriginRightTriggerClick   EXboxOrigin = 11
-	EXboxOriginLeftStickMove       EXboxOrigin = 12
-	EXboxOriginLeftStickClick      EXboxOrigin = 13
-	EXboxOriginLeftStickDPadNorth  EXboxOrigin = 14
-	EXboxOriginLeftStickDPadSouth  EXboxOrigin = 15
-	EXboxOriginLeftStickDPadWest   EXboxOrigin = 16
-	EXboxOriginLeftStickDPadEast   EXboxOrigin = 17
-	EXboxOriginRightStickMove      EXboxOrigin = 18
-	EXboxOriginRightStickClick     EXboxOrigin = 19
-	EXboxOriginRightStickDPadNorth EXboxOrigin = 20
-	EXboxOriginRightStickDPadSouth EXboxOrigin = 21
-	EXboxOriginRightStickDPadWest  EXboxOrigin = 22
-	EXboxOriginRightStickDPadEast  EXboxOrigin = 23
-	EXboxOriginDPadNorth           EXboxOrigin = 24
-	EXboxOriginDPadSouth           EXboxOrigin = 25
-	EXboxOriginDPadWest            EXboxOrigin = 26
-	EXboxOriginDPadEast            EXboxOrigin = 27
-	EXboxOriginCount               EXboxOrigin = 28
+	EXboxOrigin_A                   EXboxOrigin = 0
+	EXboxOrigin_B                   EXboxOrigin = 1
+	EXboxOrigin_X                   EXboxOrigin = 2
+	EXboxOrigin_Y                   EXboxOrigin = 3
+	EXboxOrigin_LeftBumper          EXboxOrigin = 4
+	EXboxOrigin_RightBumper         EXboxOrigin = 5
+	EXboxOrigin_Menu                EXboxOrigin = 6
+	EXboxOrigin_View                EXboxOrigin = 7
+	EXboxOrigin_LeftTriggerPull     EXboxOrigin = 8
+	EXboxOrigin_LeftTriggerClick    EXboxOrigin = 9
+	EXboxOrigin_RightTriggerPull    EXboxOrigin = 10
+	EXboxOrigin_RightTriggerClick   EXboxOrigin = 11
+	EXboxOrigin_LeftStickMove       EXboxOrigin = 12
+	EXboxOrigin_LeftStickClick      EXboxOrigin = 13
+	EXboxOrigin_LeftStickDPadNorth  EXboxOrigin = 14
+	EXboxOrigin_LeftStickDPadSouth  EXboxOrigin = 15
+	EXboxOrigin_LeftStickDPadWest   EXboxOrigin = 16
+	EXboxOrigin_LeftStickDPadEast   EXboxOrigin = 17
+	EXboxOrigin_RightStickMove      EXboxOrigin = 18
+	EXboxOrigin_RightStickClick     EXboxOrigin = 19
+	EXboxOrigin_RightStickDPadNorth EXboxOrigin = 20
+	EXboxOrigin_RightStickDPadSouth EXboxOrigin = 21
+	EXboxOrigin_RightStickDPadWest  EXboxOrigin = 22
+	EXboxOrigin_RightStickDPadEast  EXboxOrigin = 23
+	EXboxOrigin_DPadNorth           EXboxOrigin = 24
+	EXboxOrigin_DPadSouth           EXboxOrigin = 25
+	EXboxOrigin_DPadWest            EXboxOrigin = 26
+	EXboxOrigin_DPadEast            EXboxOrigin = 27
+	EXboxOrigin_Count               EXboxOrigin = 28
 )
 
 type InputDigitalActionData struct {
@@ -1603,51 +1599,51 @@ type DigitalAction struct {
 type EControllerHapticType int32
 
 const (
-	EControllerHapticTypeOff   EControllerHapticType = 0
-	EControllerHapticTypeTick  EControllerHapticType = 1
-	EControllerHapticTypeClick EControllerHapticType = 2
+	EControllerHapticType_Off   EControllerHapticType = 0
+	EControllerHapticType_Tick  EControllerHapticType = 1
+	EControllerHapticType_Click EControllerHapticType = 2
 )
 
 type ESteamInputConfigurationEnableType int32
 
 const (
-	ESteamInputConfigurationEnableTypeNone        ESteamInputConfigurationEnableType = 0
-	ESteamInputConfigurationEnableTypePlaystation ESteamInputConfigurationEnableType = 1
-	ESteamInputConfigurationEnableTypeXbox        ESteamInputConfigurationEnableType = 2
-	ESteamInputConfigurationEnableTypeGeneric     ESteamInputConfigurationEnableType = 4
-	ESteamInputConfigurationEnableTypeSwitch      ESteamInputConfigurationEnableType = 8
+	ESteamInputConfigurationEnableType_None        ESteamInputConfigurationEnableType = 0
+	ESteamInputConfigurationEnableType_Playstation ESteamInputConfigurationEnableType = 1
+	ESteamInputConfigurationEnableType_Xbox        ESteamInputConfigurationEnableType = 2
+	ESteamInputConfigurationEnableType_Generic     ESteamInputConfigurationEnableType = 4
+	ESteamInputConfigurationEnableType_Switch      ESteamInputConfigurationEnableType = 8
 )
 
 type ESteamInputLEDFlag int32
 
 const (
-	ESteamInputLEDFlagSetColor           ESteamInputLEDFlag = 0
-	ESteamInputLEDFlagRestoreUserDefault ESteamInputLEDFlag = 1
+	ESteamInputLEDFlag_SetColor           ESteamInputLEDFlag = 0
+	ESteamInputLEDFlag_RestoreUserDefault ESteamInputLEDFlag = 1
 )
 
 type ESteamInputGlyphStyle int32
 
 const (
-	ESteamInputGlyphStyleKnockout         ESteamInputGlyphStyle = 0
-	ESteamInputGlyphStyleLight            ESteamInputGlyphStyle = 1
-	ESteamInputGlyphStyleDark             ESteamInputGlyphStyle = 2
-	ESteamInputGlyphStyleNeutralColorABXY ESteamInputGlyphStyle = 16
-	ESteamInputGlyphStyleSolidABXY        ESteamInputGlyphStyle = 32
+	ESteamInputGlyphStyle_Knockout         ESteamInputGlyphStyle = 0
+	ESteamInputGlyphStyle_Light            ESteamInputGlyphStyle = 1
+	ESteamInputGlyphStyle_Dark             ESteamInputGlyphStyle = 2
+	ESteamInputGlyphStyle_NeutralColorABXY ESteamInputGlyphStyle = 16
+	ESteamInputGlyphStyle_SolidABXY        ESteamInputGlyphStyle = 32
 )
 
 type ESteamInputActionEventType int32
 
 const (
-	ESteamInputActionEventTypeDigitalAction ESteamInputActionEventType = 0
-	ESteamInputActionEventTypeAnalogAction  ESteamInputActionEventType = 1
+	ESteamInputActionEventType_DigitalAction ESteamInputActionEventType = 0
+	ESteamInputActionEventType_AnalogAction  ESteamInputActionEventType = 1
 )
 
 type EControllerHapticLocation int32
 
 const (
-	EControllerHapticLocationLeft  EControllerHapticLocation = 1
-	EControllerHapticLocationRight EControllerHapticLocation = 2
-	EControllerHapticLocationBoth  EControllerHapticLocation = 3
+	EControllerHapticLocation_Left  EControllerHapticLocation = 1
+	EControllerHapticLocation_Right EControllerHapticLocation = 2
+	EControllerHapticLocation_Both  EControllerHapticLocation = 3
 )
 
 type ScePadTriggerEffectParam struct{}
@@ -1655,430 +1651,430 @@ type ScePadTriggerEffectParam struct{}
 type ESteamInputGlyphSize int32
 
 const (
-	ESteamInputGlyphSizeSmall  ESteamInputGlyphSize = 0
-	ESteamInputGlyphSizeMedium ESteamInputGlyphSize = 1
-	ESteamInputGlyphSizeLarge  ESteamInputGlyphSize = 2
-	ESteamInputGlyphSizeCount  ESteamInputGlyphSize = 3
+	ESteamInputGlyphSize_Small  ESteamInputGlyphSize = 0
+	ESteamInputGlyphSize_Medium ESteamInputGlyphSize = 1
+	ESteamInputGlyphSize_Large  ESteamInputGlyphSize = 2
+	ESteamInputGlyphSize_Count  ESteamInputGlyphSize = 3
 )
 
 type EInputActionOrigin int32
 
 const (
-	EInputActionOriginNone                              EInputActionOrigin = 0
-	EInputActionOriginSteamControllerA                  EInputActionOrigin = 1
-	EInputActionOriginSteamControllerB                  EInputActionOrigin = 2
-	EInputActionOriginSteamControllerX                  EInputActionOrigin = 3
-	EInputActionOriginSteamControllerY                  EInputActionOrigin = 4
-	EInputActionOriginSteamControllerLeftBumper         EInputActionOrigin = 5
-	EInputActionOriginSteamControllerRightBumper        EInputActionOrigin = 6
-	EInputActionOriginSteamControllerLeftGrip           EInputActionOrigin = 7
-	EInputActionOriginSteamControllerRightGrip          EInputActionOrigin = 8
-	EInputActionOriginSteamControllerStart              EInputActionOrigin = 9
-	EInputActionOriginSteamControllerBack               EInputActionOrigin = 10
-	EInputActionOriginSteamControllerLeftPadTouch       EInputActionOrigin = 11
-	EInputActionOriginSteamControllerLeftPadSwipe       EInputActionOrigin = 12
-	EInputActionOriginSteamControllerLeftPadClick       EInputActionOrigin = 13
-	EInputActionOriginSteamControllerLeftPadDPadNorth   EInputActionOrigin = 14
-	EInputActionOriginSteamControllerLeftPadDPadSouth   EInputActionOrigin = 15
-	EInputActionOriginSteamControllerLeftPadDPadWest    EInputActionOrigin = 16
-	EInputActionOriginSteamControllerLeftPadDPadEast    EInputActionOrigin = 17
-	EInputActionOriginSteamControllerRightPadTouch      EInputActionOrigin = 18
-	EInputActionOriginSteamControllerRightPadSwipe      EInputActionOrigin = 19
-	EInputActionOriginSteamControllerRightPadClick      EInputActionOrigin = 20
-	EInputActionOriginSteamControllerRightPadDPadNorth  EInputActionOrigin = 21
-	EInputActionOriginSteamControllerRightPadDPadSouth  EInputActionOrigin = 22
-	EInputActionOriginSteamControllerRightPadDPadWest   EInputActionOrigin = 23
-	EInputActionOriginSteamControllerRightPadDPadEast   EInputActionOrigin = 24
-	EInputActionOriginSteamControllerLeftTriggerPull    EInputActionOrigin = 25
-	EInputActionOriginSteamControllerLeftTriggerClick   EInputActionOrigin = 26
-	EInputActionOriginSteamControllerRightTriggerPull   EInputActionOrigin = 27
-	EInputActionOriginSteamControllerRightTriggerClick  EInputActionOrigin = 28
-	EInputActionOriginSteamControllerLeftStickMove      EInputActionOrigin = 29
-	EInputActionOriginSteamControllerLeftStickClick     EInputActionOrigin = 30
-	EInputActionOriginSteamControllerLeftStickDPadNorth EInputActionOrigin = 31
-	EInputActionOriginSteamControllerLeftStickDPadSouth EInputActionOrigin = 32
-	EInputActionOriginSteamControllerLeftStickDPadWest  EInputActionOrigin = 33
-	EInputActionOriginSteamControllerLeftStickDPadEast  EInputActionOrigin = 34
-	EInputActionOriginSteamControllerGyroMove           EInputActionOrigin = 35
-	EInputActionOriginSteamControllerGyroPitch          EInputActionOrigin = 36
-	EInputActionOriginSteamControllerGyroYaw            EInputActionOrigin = 37
-	EInputActionOriginSteamControllerGyroRoll           EInputActionOrigin = 38
-	EInputActionOriginSteamControllerReserved0          EInputActionOrigin = 39
-	EInputActionOriginSteamControllerReserved1          EInputActionOrigin = 40
-	EInputActionOriginSteamControllerReserved2          EInputActionOrigin = 41
-	EInputActionOriginSteamControllerReserved3          EInputActionOrigin = 42
-	EInputActionOriginSteamControllerReserved4          EInputActionOrigin = 43
-	EInputActionOriginSteamControllerReserved5          EInputActionOrigin = 44
-	EInputActionOriginSteamControllerReserved6          EInputActionOrigin = 45
-	EInputActionOriginSteamControllerReserved7          EInputActionOrigin = 46
-	EInputActionOriginSteamControllerReserved8          EInputActionOrigin = 47
-	EInputActionOriginSteamControllerReserved9          EInputActionOrigin = 48
-	EInputActionOriginSteamControllerReserved10         EInputActionOrigin = 49
-	EInputActionOriginPS4X                              EInputActionOrigin = 50
-	EInputActionOriginPS4Circle                         EInputActionOrigin = 51
-	EInputActionOriginPS4Triangle                       EInputActionOrigin = 52
-	EInputActionOriginPS4Square                         EInputActionOrigin = 53
-	EInputActionOriginPS4LeftBumper                     EInputActionOrigin = 54
-	EInputActionOriginPS4RightBumper                    EInputActionOrigin = 55
-	EInputActionOriginPS4Options                        EInputActionOrigin = 56
-	EInputActionOriginPS4Share                          EInputActionOrigin = 57
-	EInputActionOriginPS4LeftPadTouch                   EInputActionOrigin = 58
-	EInputActionOriginPS4LeftPadSwipe                   EInputActionOrigin = 59
-	EInputActionOriginPS4LeftPadClick                   EInputActionOrigin = 60
-	EInputActionOriginPS4LeftPadDPadNorth               EInputActionOrigin = 61
-	EInputActionOriginPS4LeftPadDPadSouth               EInputActionOrigin = 62
-	EInputActionOriginPS4LeftPadDPadWest                EInputActionOrigin = 63
-	EInputActionOriginPS4LeftPadDPadEast                EInputActionOrigin = 64
-	EInputActionOriginPS4RightPadTouch                  EInputActionOrigin = 65
-	EInputActionOriginPS4RightPadSwipe                  EInputActionOrigin = 66
-	EInputActionOriginPS4RightPadClick                  EInputActionOrigin = 67
-	EInputActionOriginPS4RightPadDPadNorth              EInputActionOrigin = 68
-	EInputActionOriginPS4RightPadDPadSouth              EInputActionOrigin = 69
-	EInputActionOriginPS4RightPadDPadWest               EInputActionOrigin = 70
-	EInputActionOriginPS4RightPadDPadEast               EInputActionOrigin = 71
-	EInputActionOriginPS4CenterPadTouch                 EInputActionOrigin = 72
-	EInputActionOriginPS4CenterPadSwipe                 EInputActionOrigin = 73
-	EInputActionOriginPS4CenterPadClick                 EInputActionOrigin = 74
-	EInputActionOriginPS4CenterPadDPadNorth             EInputActionOrigin = 75
-	EInputActionOriginPS4CenterPadDPadSouth             EInputActionOrigin = 76
-	EInputActionOriginPS4CenterPadDPadWest              EInputActionOrigin = 77
-	EInputActionOriginPS4CenterPadDPadEast              EInputActionOrigin = 78
-	EInputActionOriginPS4LeftTriggerPull                EInputActionOrigin = 79
-	EInputActionOriginPS4LeftTriggerClick               EInputActionOrigin = 80
-	EInputActionOriginPS4RightTriggerPull               EInputActionOrigin = 81
-	EInputActionOriginPS4RightTriggerClick              EInputActionOrigin = 82
-	EInputActionOriginPS4LeftStickMove                  EInputActionOrigin = 83
-	EInputActionOriginPS4LeftStickClick                 EInputActionOrigin = 84
-	EInputActionOriginPS4LeftStickDPadNorth             EInputActionOrigin = 85
-	EInputActionOriginPS4LeftStickDPadSouth             EInputActionOrigin = 86
-	EInputActionOriginPS4LeftStickDPadWest              EInputActionOrigin = 87
-	EInputActionOriginPS4LeftStickDPadEast              EInputActionOrigin = 88
-	EInputActionOriginPS4RightStickMove                 EInputActionOrigin = 89
-	EInputActionOriginPS4RightStickClick                EInputActionOrigin = 90
-	EInputActionOriginPS4RightStickDPadNorth            EInputActionOrigin = 91
-	EInputActionOriginPS4RightStickDPadSouth            EInputActionOrigin = 92
-	EInputActionOriginPS4RightStickDPadWest             EInputActionOrigin = 93
-	EInputActionOriginPS4RightStickDPadEast             EInputActionOrigin = 94
-	EInputActionOriginPS4DPadNorth                      EInputActionOrigin = 95
-	EInputActionOriginPS4DPadSouth                      EInputActionOrigin = 96
-	EInputActionOriginPS4DPadWest                       EInputActionOrigin = 97
-	EInputActionOriginPS4DPadEast                       EInputActionOrigin = 98
-	EInputActionOriginPS4GyroMove                       EInputActionOrigin = 99
-	EInputActionOriginPS4GyroPitch                      EInputActionOrigin = 100
-	EInputActionOriginPS4GyroYaw                        EInputActionOrigin = 101
-	EInputActionOriginPS4GyroRoll                       EInputActionOrigin = 102
-	EInputActionOriginPS4DPadMove                       EInputActionOrigin = 103
-	EInputActionOriginPS4Reserved1                      EInputActionOrigin = 104
-	EInputActionOriginPS4Reserved2                      EInputActionOrigin = 105
-	EInputActionOriginPS4Reserved3                      EInputActionOrigin = 106
-	EInputActionOriginPS4Reserved4                      EInputActionOrigin = 107
-	EInputActionOriginPS4Reserved5                      EInputActionOrigin = 108
-	EInputActionOriginPS4Reserved6                      EInputActionOrigin = 109
-	EInputActionOriginPS4Reserved7                      EInputActionOrigin = 110
-	EInputActionOriginPS4Reserved8                      EInputActionOrigin = 111
-	EInputActionOriginPS4Reserved9                      EInputActionOrigin = 112
-	EInputActionOriginPS4Reserved10                     EInputActionOrigin = 113
-	EInputActionOriginXBoxOneA                          EInputActionOrigin = 114
-	EInputActionOriginXBoxOneB                          EInputActionOrigin = 115
-	EInputActionOriginXBoxOneX                          EInputActionOrigin = 116
-	EInputActionOriginXBoxOneY                          EInputActionOrigin = 117
-	EInputActionOriginXBoxOneLeftBumper                 EInputActionOrigin = 118
-	EInputActionOriginXBoxOneRightBumper                EInputActionOrigin = 119
-	EInputActionOriginXBoxOneMenu                       EInputActionOrigin = 120
-	EInputActionOriginXBoxOneView                       EInputActionOrigin = 121
-	EInputActionOriginXBoxOneLeftTriggerPull            EInputActionOrigin = 122
-	EInputActionOriginXBoxOneLeftTriggerClick           EInputActionOrigin = 123
-	EInputActionOriginXBoxOneRightTriggerPull           EInputActionOrigin = 124
-	EInputActionOriginXBoxOneRightTriggerClick          EInputActionOrigin = 125
-	EInputActionOriginXBoxOneLeftStickMove              EInputActionOrigin = 126
-	EInputActionOriginXBoxOneLeftStickClick             EInputActionOrigin = 127
-	EInputActionOriginXBoxOneLeftStickDPadNorth         EInputActionOrigin = 128
-	EInputActionOriginXBoxOneLeftStickDPadSouth         EInputActionOrigin = 129
-	EInputActionOriginXBoxOneLeftStickDPadWest          EInputActionOrigin = 130
-	EInputActionOriginXBoxOneLeftStickDPadEast          EInputActionOrigin = 131
-	EInputActionOriginXBoxOneRightStickMove             EInputActionOrigin = 132
-	EInputActionOriginXBoxOneRightStickClick            EInputActionOrigin = 133
-	EInputActionOriginXBoxOneRightStickDPadNorth        EInputActionOrigin = 134
-	EInputActionOriginXBoxOneRightStickDPadSouth        EInputActionOrigin = 135
-	EInputActionOriginXBoxOneRightStickDPadWest         EInputActionOrigin = 136
-	EInputActionOriginXBoxOneRightStickDPadEast         EInputActionOrigin = 137
-	EInputActionOriginXBoxOneDPadNorth                  EInputActionOrigin = 138
-	EInputActionOriginXBoxOneDPadSouth                  EInputActionOrigin = 139
-	EInputActionOriginXBoxOneDPadWest                   EInputActionOrigin = 140
-	EInputActionOriginXBoxOneDPadEast                   EInputActionOrigin = 141
-	EInputActionOriginXBoxOneDPadMove                   EInputActionOrigin = 142
-	EInputActionOriginXBoxOneLeftGripLower              EInputActionOrigin = 143
-	EInputActionOriginXBoxOneLeftGripUpper              EInputActionOrigin = 144
-	EInputActionOriginXBoxOneRightGripLower             EInputActionOrigin = 145
-	EInputActionOriginXBoxOneRightGripUpper             EInputActionOrigin = 146
-	EInputActionOriginXBoxOneShare                      EInputActionOrigin = 147
-	EInputActionOriginXBoxOneReserved6                  EInputActionOrigin = 148
-	EInputActionOriginXBoxOneReserved7                  EInputActionOrigin = 149
-	EInputActionOriginXBoxOneReserved8                  EInputActionOrigin = 150
-	EInputActionOriginXBoxOneReserved9                  EInputActionOrigin = 151
-	EInputActionOriginXBoxOneReserved10                 EInputActionOrigin = 152
-	EInputActionOriginXBox360A                          EInputActionOrigin = 153
-	EInputActionOriginXBox360B                          EInputActionOrigin = 154
-	EInputActionOriginXBox360X                          EInputActionOrigin = 155
-	EInputActionOriginXBox360Y                          EInputActionOrigin = 156
-	EInputActionOriginXBox360LeftBumper                 EInputActionOrigin = 157
-	EInputActionOriginXBox360RightBumper                EInputActionOrigin = 158
-	EInputActionOriginXBox360Start                      EInputActionOrigin = 159
-	EInputActionOriginXBox360Back                       EInputActionOrigin = 160
-	EInputActionOriginXBox360LeftTriggerPull            EInputActionOrigin = 161
-	EInputActionOriginXBox360LeftTriggerClick           EInputActionOrigin = 162
-	EInputActionOriginXBox360RightTriggerPull           EInputActionOrigin = 163
-	EInputActionOriginXBox360RightTriggerClick          EInputActionOrigin = 164
-	EInputActionOriginXBox360LeftStickMove              EInputActionOrigin = 165
-	EInputActionOriginXBox360LeftStickClick             EInputActionOrigin = 166
-	EInputActionOriginXBox360LeftStickDPadNorth         EInputActionOrigin = 167
-	EInputActionOriginXBox360LeftStickDPadSouth         EInputActionOrigin = 168
-	EInputActionOriginXBox360LeftStickDPadWest          EInputActionOrigin = 169
-	EInputActionOriginXBox360LeftStickDPadEast          EInputActionOrigin = 170
-	EInputActionOriginXBox360RightStickMove             EInputActionOrigin = 171
-	EInputActionOriginXBox360RightStickClick            EInputActionOrigin = 172
-	EInputActionOriginXBox360RightStickDPadNorth        EInputActionOrigin = 173
-	EInputActionOriginXBox360RightStickDPadSouth        EInputActionOrigin = 174
-	EInputActionOriginXBox360RightStickDPadWest         EInputActionOrigin = 175
-	EInputActionOriginXBox360RightStickDPadEast         EInputActionOrigin = 176
-	EInputActionOriginXBox360DPadNorth                  EInputActionOrigin = 177
-	EInputActionOriginXBox360DPadSouth                  EInputActionOrigin = 178
-	EInputActionOriginXBox360DPadWest                   EInputActionOrigin = 179
-	EInputActionOriginXBox360DPadEast                   EInputActionOrigin = 180
-	EInputActionOriginXBox360DPadMove                   EInputActionOrigin = 181
-	EInputActionOriginXBox360Reserved1                  EInputActionOrigin = 182
-	EInputActionOriginXBox360Reserved2                  EInputActionOrigin = 183
-	EInputActionOriginXBox360Reserved3                  EInputActionOrigin = 184
-	EInputActionOriginXBox360Reserved4                  EInputActionOrigin = 185
-	EInputActionOriginXBox360Reserved5                  EInputActionOrigin = 186
-	EInputActionOriginXBox360Reserved6                  EInputActionOrigin = 187
-	EInputActionOriginXBox360Reserved7                  EInputActionOrigin = 188
-	EInputActionOriginXBox360Reserved8                  EInputActionOrigin = 189
-	EInputActionOriginXBox360Reserved9                  EInputActionOrigin = 190
-	EInputActionOriginXBox360Reserved10                 EInputActionOrigin = 191
-	EInputActionOriginSwitchA                           EInputActionOrigin = 192
-	EInputActionOriginSwitchB                           EInputActionOrigin = 193
-	EInputActionOriginSwitchX                           EInputActionOrigin = 194
-	EInputActionOriginSwitchY                           EInputActionOrigin = 195
-	EInputActionOriginSwitchLeftBumper                  EInputActionOrigin = 196
-	EInputActionOriginSwitchRightBumper                 EInputActionOrigin = 197
-	EInputActionOriginSwitchPlus                        EInputActionOrigin = 198
-	EInputActionOriginSwitchMinus                       EInputActionOrigin = 199
-	EInputActionOriginSwitchCapture                     EInputActionOrigin = 200
-	EInputActionOriginSwitchLeftTriggerPull             EInputActionOrigin = 201
-	EInputActionOriginSwitchLeftTriggerClick            EInputActionOrigin = 202
-	EInputActionOriginSwitchRightTriggerPull            EInputActionOrigin = 203
-	EInputActionOriginSwitchRightTriggerClick           EInputActionOrigin = 204
-	EInputActionOriginSwitchLeftStickMove               EInputActionOrigin = 205
-	EInputActionOriginSwitchLeftStickClick              EInputActionOrigin = 206
-	EInputActionOriginSwitchLeftStickDPadNorth          EInputActionOrigin = 207
-	EInputActionOriginSwitchLeftStickDPadSouth          EInputActionOrigin = 208
-	EInputActionOriginSwitchLeftStickDPadWest           EInputActionOrigin = 209
-	EInputActionOriginSwitchLeftStickDPadEast           EInputActionOrigin = 210
-	EInputActionOriginSwitchRightStickMove              EInputActionOrigin = 211
-	EInputActionOriginSwitchRightStickClick             EInputActionOrigin = 212
-	EInputActionOriginSwitchRightStickDPadNorth         EInputActionOrigin = 213
-	EInputActionOriginSwitchRightStickDPadSouth         EInputActionOrigin = 214
-	EInputActionOriginSwitchRightStickDPadWest          EInputActionOrigin = 215
-	EInputActionOriginSwitchRightStickDPadEast          EInputActionOrigin = 216
-	EInputActionOriginSwitchDPadNorth                   EInputActionOrigin = 217
-	EInputActionOriginSwitchDPadSouth                   EInputActionOrigin = 218
-	EInputActionOriginSwitchDPadWest                    EInputActionOrigin = 219
-	EInputActionOriginSwitchDPadEast                    EInputActionOrigin = 220
-	EInputActionOriginSwitchProGyroMove                 EInputActionOrigin = 221
-	EInputActionOriginSwitchProGyroPitch                EInputActionOrigin = 222
-	EInputActionOriginSwitchProGyroYaw                  EInputActionOrigin = 223
-	EInputActionOriginSwitchProGyroRoll                 EInputActionOrigin = 224
-	EInputActionOriginSwitchDPadMove                    EInputActionOrigin = 225
-	EInputActionOriginSwitchReserved1                   EInputActionOrigin = 226
-	EInputActionOriginSwitchReserved2                   EInputActionOrigin = 227
-	EInputActionOriginSwitchReserved3                   EInputActionOrigin = 228
-	EInputActionOriginSwitchReserved4                   EInputActionOrigin = 229
-	EInputActionOriginSwitchReserved5                   EInputActionOrigin = 230
-	EInputActionOriginSwitchReserved6                   EInputActionOrigin = 231
-	EInputActionOriginSwitchReserved7                   EInputActionOrigin = 232
-	EInputActionOriginSwitchReserved8                   EInputActionOrigin = 233
-	EInputActionOriginSwitchReserved9                   EInputActionOrigin = 234
-	EInputActionOriginSwitchReserved10                  EInputActionOrigin = 235
-	EInputActionOriginSwitchRightGyroMove               EInputActionOrigin = 236
-	EInputActionOriginSwitchRightGyroPitch              EInputActionOrigin = 237
-	EInputActionOriginSwitchRightGyroYaw                EInputActionOrigin = 238
-	EInputActionOriginSwitchRightGyroRoll               EInputActionOrigin = 239
-	EInputActionOriginSwitchLeftGyroMove                EInputActionOrigin = 240
-	EInputActionOriginSwitchLeftGyroPitch               EInputActionOrigin = 241
-	EInputActionOriginSwitchLeftGyroYaw                 EInputActionOrigin = 242
-	EInputActionOriginSwitchLeftGyroRoll                EInputActionOrigin = 243
-	EInputActionOriginSwitchLeftGripLower               EInputActionOrigin = 244
-	EInputActionOriginSwitchLeftGripUpper               EInputActionOrigin = 245
-	EInputActionOriginSwitchRightGripLower              EInputActionOrigin = 246
-	EInputActionOriginSwitchRightGripUpper              EInputActionOrigin = 247
-	EInputActionOriginSwitchJoyConButtonN               EInputActionOrigin = 248
-	EInputActionOriginSwitchJoyConButtonE               EInputActionOrigin = 249
-	EInputActionOriginSwitchJoyConButtonS               EInputActionOrigin = 250
-	EInputActionOriginSwitchJoyConButtonW               EInputActionOrigin = 251
-	EInputActionOriginSwitchReserved15                  EInputActionOrigin = 252
-	EInputActionOriginSwitchReserved16                  EInputActionOrigin = 253
-	EInputActionOriginSwitchReserved17                  EInputActionOrigin = 254
-	EInputActionOriginSwitchReserved18                  EInputActionOrigin = 255
-	EInputActionOriginSwitchReserved19                  EInputActionOrigin = 256
-	EInputActionOriginSwitchReserved20                  EInputActionOrigin = 257
-	EInputActionOriginPS5X                              EInputActionOrigin = 258
-	EInputActionOriginPS5Circle                         EInputActionOrigin = 259
-	EInputActionOriginPS5Triangle                       EInputActionOrigin = 260
-	EInputActionOriginPS5Square                         EInputActionOrigin = 261
-	EInputActionOriginPS5LeftBumper                     EInputActionOrigin = 262
-	EInputActionOriginPS5RightBumper                    EInputActionOrigin = 263
-	EInputActionOriginPS5Option                         EInputActionOrigin = 264
-	EInputActionOriginPS5Create                         EInputActionOrigin = 265
-	EInputActionOriginPS5Mute                           EInputActionOrigin = 266
-	EInputActionOriginPS5LeftPadTouch                   EInputActionOrigin = 267
-	EInputActionOriginPS5LeftPadSwipe                   EInputActionOrigin = 268
-	EInputActionOriginPS5LeftPadClick                   EInputActionOrigin = 269
-	EInputActionOriginPS5LeftPadDPadNorth               EInputActionOrigin = 270
-	EInputActionOriginPS5LeftPadDPadSouth               EInputActionOrigin = 271
-	EInputActionOriginPS5LeftPadDPadWest                EInputActionOrigin = 272
-	EInputActionOriginPS5LeftPadDPadEast                EInputActionOrigin = 273
-	EInputActionOriginPS5RightPadTouch                  EInputActionOrigin = 274
-	EInputActionOriginPS5RightPadSwipe                  EInputActionOrigin = 275
-	EInputActionOriginPS5RightPadClick                  EInputActionOrigin = 276
-	EInputActionOriginPS5RightPadDPadNorth              EInputActionOrigin = 277
-	EInputActionOriginPS5RightPadDPadSouth              EInputActionOrigin = 278
-	EInputActionOriginPS5RightPadDPadWest               EInputActionOrigin = 279
-	EInputActionOriginPS5RightPadDPadEast               EInputActionOrigin = 280
-	EInputActionOriginPS5CenterPadTouch                 EInputActionOrigin = 281
-	EInputActionOriginPS5CenterPadSwipe                 EInputActionOrigin = 282
-	EInputActionOriginPS5CenterPadClick                 EInputActionOrigin = 283
-	EInputActionOriginPS5CenterPadDPadNorth             EInputActionOrigin = 284
-	EInputActionOriginPS5CenterPadDPadSouth             EInputActionOrigin = 285
-	EInputActionOriginPS5CenterPadDPadWest              EInputActionOrigin = 286
-	EInputActionOriginPS5CenterPadDPadEast              EInputActionOrigin = 287
-	EInputActionOriginPS5LeftTriggerPull                EInputActionOrigin = 288
-	EInputActionOriginPS5LeftTriggerClick               EInputActionOrigin = 289
-	EInputActionOriginPS5RightTriggerPull               EInputActionOrigin = 290
-	EInputActionOriginPS5RightTriggerClick              EInputActionOrigin = 291
-	EInputActionOriginPS5LeftStickMove                  EInputActionOrigin = 292
-	EInputActionOriginPS5LeftStickClick                 EInputActionOrigin = 293
-	EInputActionOriginPS5LeftStickDPadNorth             EInputActionOrigin = 294
-	EInputActionOriginPS5LeftStickDPadSouth             EInputActionOrigin = 295
-	EInputActionOriginPS5LeftStickDPadWest              EInputActionOrigin = 296
-	EInputActionOriginPS5LeftStickDPadEast              EInputActionOrigin = 297
-	EInputActionOriginPS5RightStickMove                 EInputActionOrigin = 298
-	EInputActionOriginPS5RightStickClick                EInputActionOrigin = 299
-	EInputActionOriginPS5RightStickDPadNorth            EInputActionOrigin = 300
-	EInputActionOriginPS5RightStickDPadSouth            EInputActionOrigin = 301
-	EInputActionOriginPS5RightStickDPadWest             EInputActionOrigin = 302
-	EInputActionOriginPS5RightStickDPadEast             EInputActionOrigin = 303
-	EInputActionOriginPS5DPadNorth                      EInputActionOrigin = 304
-	EInputActionOriginPS5DPadSouth                      EInputActionOrigin = 305
-	EInputActionOriginPS5DPadWest                       EInputActionOrigin = 306
-	EInputActionOriginPS5DPadEast                       EInputActionOrigin = 307
-	EInputActionOriginPS5GyroMove                       EInputActionOrigin = 308
-	EInputActionOriginPS5GyroPitch                      EInputActionOrigin = 309
-	EInputActionOriginPS5GyroYaw                        EInputActionOrigin = 310
-	EInputActionOriginPS5GyroRoll                       EInputActionOrigin = 311
-	EInputActionOriginPS5DPadMove                       EInputActionOrigin = 312
-	EInputActionOriginPS5LeftGrip                       EInputActionOrigin = 313
-	EInputActionOriginPS5RightGrip                      EInputActionOrigin = 314
-	EInputActionOriginPS5LeftFn                         EInputActionOrigin = 315
-	EInputActionOriginPS5RightFn                        EInputActionOrigin = 316
-	EInputActionOriginPS5Reserved5                      EInputActionOrigin = 317
-	EInputActionOriginPS5Reserved6                      EInputActionOrigin = 318
-	EInputActionOriginPS5Reserved7                      EInputActionOrigin = 319
-	EInputActionOriginPS5Reserved8                      EInputActionOrigin = 320
-	EInputActionOriginPS5Reserved9                      EInputActionOrigin = 321
-	EInputActionOriginPS5Reserved10                     EInputActionOrigin = 322
-	EInputActionOriginPS5Reserved11                     EInputActionOrigin = 323
-	EInputActionOriginPS5Reserved12                     EInputActionOrigin = 324
-	EInputActionOriginPS5Reserved13                     EInputActionOrigin = 325
-	EInputActionOriginPS5Reserved14                     EInputActionOrigin = 326
-	EInputActionOriginPS5Reserved15                     EInputActionOrigin = 327
-	EInputActionOriginPS5Reserved16                     EInputActionOrigin = 328
-	EInputActionOriginPS5Reserved17                     EInputActionOrigin = 329
-	EInputActionOriginPS5Reserved18                     EInputActionOrigin = 330
-	EInputActionOriginPS5Reserved19                     EInputActionOrigin = 331
-	EInputActionOriginPS5Reserved20                     EInputActionOrigin = 332
-	EInputActionOriginSteamDeckA                        EInputActionOrigin = 333
-	EInputActionOriginSteamDeckB                        EInputActionOrigin = 334
-	EInputActionOriginSteamDeckX                        EInputActionOrigin = 335
-	EInputActionOriginSteamDeckY                        EInputActionOrigin = 336
-	EInputActionOriginSteamDeckL1                       EInputActionOrigin = 337
-	EInputActionOriginSteamDeckR1                       EInputActionOrigin = 338
-	EInputActionOriginSteamDeckMenu                     EInputActionOrigin = 339
-	EInputActionOriginSteamDeckView                     EInputActionOrigin = 340
-	EInputActionOriginSteamDeckLeftPadTouch             EInputActionOrigin = 341
-	EInputActionOriginSteamDeckLeftPadSwipe             EInputActionOrigin = 342
-	EInputActionOriginSteamDeckLeftPadClick             EInputActionOrigin = 343
-	EInputActionOriginSteamDeckLeftPadDPadNorth         EInputActionOrigin = 344
-	EInputActionOriginSteamDeckLeftPadDPadSouth         EInputActionOrigin = 345
-	EInputActionOriginSteamDeckLeftPadDPadWest          EInputActionOrigin = 346
-	EInputActionOriginSteamDeckLeftPadDPadEast          EInputActionOrigin = 347
-	EInputActionOriginSteamDeckRightPadTouch            EInputActionOrigin = 348
-	EInputActionOriginSteamDeckRightPadSwipe            EInputActionOrigin = 349
-	EInputActionOriginSteamDeckRightPadClick            EInputActionOrigin = 350
-	EInputActionOriginSteamDeckRightPadDPadNorth        EInputActionOrigin = 351
-	EInputActionOriginSteamDeckRightPadDPadSouth        EInputActionOrigin = 352
-	EInputActionOriginSteamDeckRightPadDPadWest         EInputActionOrigin = 353
-	EInputActionOriginSteamDeckRightPadDPadEast         EInputActionOrigin = 354
-	EInputActionOriginSteamDeckL2SoftPull               EInputActionOrigin = 355
-	EInputActionOriginSteamDeckL2                       EInputActionOrigin = 356
-	EInputActionOriginSteamDeckR2SoftPull               EInputActionOrigin = 357
-	EInputActionOriginSteamDeckR2                       EInputActionOrigin = 358
-	EInputActionOriginSteamDeckLeftStickMove            EInputActionOrigin = 359
-	EInputActionOriginSteamDeckL3                       EInputActionOrigin = 360
-	EInputActionOriginSteamDeckLeftStickDPadNorth       EInputActionOrigin = 361
-	EInputActionOriginSteamDeckLeftStickDPadSouth       EInputActionOrigin = 362
-	EInputActionOriginSteamDeckLeftStickDPadWest        EInputActionOrigin = 363
-	EInputActionOriginSteamDeckLeftStickDPadEast        EInputActionOrigin = 364
-	EInputActionOriginSteamDeckLeftStickTouch           EInputActionOrigin = 365
-	EInputActionOriginSteamDeckRightStickMove           EInputActionOrigin = 366
-	EInputActionOriginSteamDeckR3                       EInputActionOrigin = 367
-	EInputActionOriginSteamDeckRightStickDPadNorth      EInputActionOrigin = 368
-	EInputActionOriginSteamDeckRightStickDPadSouth      EInputActionOrigin = 369
-	EInputActionOriginSteamDeckRightStickDPadWest       EInputActionOrigin = 370
-	EInputActionOriginSteamDeckRightStickDPadEast       EInputActionOrigin = 371
-	EInputActionOriginSteamDeckRightStickTouch          EInputActionOrigin = 372
-	EInputActionOriginSteamDeckL4                       EInputActionOrigin = 373
-	EInputActionOriginSteamDeckR4                       EInputActionOrigin = 374
-	EInputActionOriginSteamDeckL5                       EInputActionOrigin = 375
-	EInputActionOriginSteamDeckR5                       EInputActionOrigin = 376
-	EInputActionOriginSteamDeckDPadMove                 EInputActionOrigin = 377
-	EInputActionOriginSteamDeckDPadNorth                EInputActionOrigin = 378
-	EInputActionOriginSteamDeckDPadSouth                EInputActionOrigin = 379
-	EInputActionOriginSteamDeckDPadWest                 EInputActionOrigin = 380
-	EInputActionOriginSteamDeckDPadEast                 EInputActionOrigin = 381
-	EInputActionOriginSteamDeckGyroMove                 EInputActionOrigin = 382
-	EInputActionOriginSteamDeckGyroPitch                EInputActionOrigin = 383
-	EInputActionOriginSteamDeckGyroYaw                  EInputActionOrigin = 384
-	EInputActionOriginSteamDeckGyroRoll                 EInputActionOrigin = 385
-	EInputActionOriginSteamDeckReserved1                EInputActionOrigin = 386
-	EInputActionOriginSteamDeckReserved2                EInputActionOrigin = 387
-	EInputActionOriginSteamDeckReserved3                EInputActionOrigin = 388
-	EInputActionOriginSteamDeckReserved4                EInputActionOrigin = 389
-	EInputActionOriginSteamDeckReserved5                EInputActionOrigin = 390
-	EInputActionOriginSteamDeckReserved6                EInputActionOrigin = 391
-	EInputActionOriginSteamDeckReserved7                EInputActionOrigin = 392
-	EInputActionOriginSteamDeckReserved8                EInputActionOrigin = 393
-	EInputActionOriginSteamDeckReserved9                EInputActionOrigin = 394
-	EInputActionOriginSteamDeckReserved10               EInputActionOrigin = 395
-	EInputActionOriginSteamDeckReserved11               EInputActionOrigin = 396
-	EInputActionOriginSteamDeckReserved12               EInputActionOrigin = 397
-	EInputActionOriginSteamDeckReserved13               EInputActionOrigin = 398
-	EInputActionOriginSteamDeckReserved14               EInputActionOrigin = 399
-	EInputActionOriginSteamDeckReserved15               EInputActionOrigin = 400
-	EInputActionOriginSteamDeckReserved16               EInputActionOrigin = 401
-	EInputActionOriginSteamDeckReserved17               EInputActionOrigin = 402
-	EInputActionOriginSteamDeckReserved18               EInputActionOrigin = 403
-	EInputActionOriginSteamDeckReserved19               EInputActionOrigin = 404
-	EInputActionOriginSteamDeckReserved20               EInputActionOrigin = 405
-	EInputActionOriginHoripadM1                         EInputActionOrigin = 406
-	EInputActionOriginHoripadM2                         EInputActionOrigin = 407
-	EInputActionOriginHoripadL4                         EInputActionOrigin = 408
-	EInputActionOriginHoripadR4                         EInputActionOrigin = 409
-	EInputActionOriginCount                             EInputActionOrigin = 410
-	EInputActionOriginMaximumPossibleValue              EInputActionOrigin = 32767
+	EInputActionOrigin_None                              EInputActionOrigin = 0
+	EInputActionOrigin_SteamControllerA                  EInputActionOrigin = 1
+	EInputActionOrigin_SteamControllerB                  EInputActionOrigin = 2
+	EInputActionOrigin_SteamControllerX                  EInputActionOrigin = 3
+	EInputActionOrigin_SteamControllerY                  EInputActionOrigin = 4
+	EInputActionOrigin_SteamControllerLeftBumper         EInputActionOrigin = 5
+	EInputActionOrigin_SteamControllerRightBumper        EInputActionOrigin = 6
+	EInputActionOrigin_SteamControllerLeftGrip           EInputActionOrigin = 7
+	EInputActionOrigin_SteamControllerRightGrip          EInputActionOrigin = 8
+	EInputActionOrigin_SteamControllerStart              EInputActionOrigin = 9
+	EInputActionOrigin_SteamControllerBack               EInputActionOrigin = 10
+	EInputActionOrigin_SteamControllerLeftPadTouch       EInputActionOrigin = 11
+	EInputActionOrigin_SteamControllerLeftPadSwipe       EInputActionOrigin = 12
+	EInputActionOrigin_SteamControllerLeftPadClick       EInputActionOrigin = 13
+	EInputActionOrigin_SteamControllerLeftPadDPadNorth   EInputActionOrigin = 14
+	EInputActionOrigin_SteamControllerLeftPadDPadSouth   EInputActionOrigin = 15
+	EInputActionOrigin_SteamControllerLeftPadDPadWest    EInputActionOrigin = 16
+	EInputActionOrigin_SteamControllerLeftPadDPadEast    EInputActionOrigin = 17
+	EInputActionOrigin_SteamControllerRightPadTouch      EInputActionOrigin = 18
+	EInputActionOrigin_SteamControllerRightPadSwipe      EInputActionOrigin = 19
+	EInputActionOrigin_SteamControllerRightPadClick      EInputActionOrigin = 20
+	EInputActionOrigin_SteamControllerRightPadDPadNorth  EInputActionOrigin = 21
+	EInputActionOrigin_SteamControllerRightPadDPadSouth  EInputActionOrigin = 22
+	EInputActionOrigin_SteamControllerRightPadDPadWest   EInputActionOrigin = 23
+	EInputActionOrigin_SteamControllerRightPadDPadEast   EInputActionOrigin = 24
+	EInputActionOrigin_SteamControllerLeftTriggerPull    EInputActionOrigin = 25
+	EInputActionOrigin_SteamControllerLeftTriggerClick   EInputActionOrigin = 26
+	EInputActionOrigin_SteamControllerRightTriggerPull   EInputActionOrigin = 27
+	EInputActionOrigin_SteamControllerRightTriggerClick  EInputActionOrigin = 28
+	EInputActionOrigin_SteamControllerLeftStickMove      EInputActionOrigin = 29
+	EInputActionOrigin_SteamControllerLeftStickClick     EInputActionOrigin = 30
+	EInputActionOrigin_SteamControllerLeftStickDPadNorth EInputActionOrigin = 31
+	EInputActionOrigin_SteamControllerLeftStickDPadSouth EInputActionOrigin = 32
+	EInputActionOrigin_SteamControllerLeftStickDPadWest  EInputActionOrigin = 33
+	EInputActionOrigin_SteamControllerLeftStickDPadEast  EInputActionOrigin = 34
+	EInputActionOrigin_SteamControllerGyroMove           EInputActionOrigin = 35
+	EInputActionOrigin_SteamControllerGyroPitch          EInputActionOrigin = 36
+	EInputActionOrigin_SteamControllerGyroYaw            EInputActionOrigin = 37
+	EInputActionOrigin_SteamControllerGyroRoll           EInputActionOrigin = 38
+	EInputActionOrigin_SteamControllerReserved0          EInputActionOrigin = 39
+	EInputActionOrigin_SteamControllerReserved1          EInputActionOrigin = 40
+	EInputActionOrigin_SteamControllerReserved2          EInputActionOrigin = 41
+	EInputActionOrigin_SteamControllerReserved3          EInputActionOrigin = 42
+	EInputActionOrigin_SteamControllerReserved4          EInputActionOrigin = 43
+	EInputActionOrigin_SteamControllerReserved5          EInputActionOrigin = 44
+	EInputActionOrigin_SteamControllerReserved6          EInputActionOrigin = 45
+	EInputActionOrigin_SteamControllerReserved7          EInputActionOrigin = 46
+	EInputActionOrigin_SteamControllerReserved8          EInputActionOrigin = 47
+	EInputActionOrigin_SteamControllerReserved9          EInputActionOrigin = 48
+	EInputActionOrigin_SteamControllerReserved10         EInputActionOrigin = 49
+	EInputActionOrigin_PS4X                              EInputActionOrigin = 50
+	EInputActionOrigin_PS4Circle                         EInputActionOrigin = 51
+	EInputActionOrigin_PS4Triangle                       EInputActionOrigin = 52
+	EInputActionOrigin_PS4Square                         EInputActionOrigin = 53
+	EInputActionOrigin_PS4LeftBumper                     EInputActionOrigin = 54
+	EInputActionOrigin_PS4RightBumper                    EInputActionOrigin = 55
+	EInputActionOrigin_PS4Options                        EInputActionOrigin = 56
+	EInputActionOrigin_PS4Share                          EInputActionOrigin = 57
+	EInputActionOrigin_PS4LeftPadTouch                   EInputActionOrigin = 58
+	EInputActionOrigin_PS4LeftPadSwipe                   EInputActionOrigin = 59
+	EInputActionOrigin_PS4LeftPadClick                   EInputActionOrigin = 60
+	EInputActionOrigin_PS4LeftPadDPadNorth               EInputActionOrigin = 61
+	EInputActionOrigin_PS4LeftPadDPadSouth               EInputActionOrigin = 62
+	EInputActionOrigin_PS4LeftPadDPadWest                EInputActionOrigin = 63
+	EInputActionOrigin_PS4LeftPadDPadEast                EInputActionOrigin = 64
+	EInputActionOrigin_PS4RightPadTouch                  EInputActionOrigin = 65
+	EInputActionOrigin_PS4RightPadSwipe                  EInputActionOrigin = 66
+	EInputActionOrigin_PS4RightPadClick                  EInputActionOrigin = 67
+	EInputActionOrigin_PS4RightPadDPadNorth              EInputActionOrigin = 68
+	EInputActionOrigin_PS4RightPadDPadSouth              EInputActionOrigin = 69
+	EInputActionOrigin_PS4RightPadDPadWest               EInputActionOrigin = 70
+	EInputActionOrigin_PS4RightPadDPadEast               EInputActionOrigin = 71
+	EInputActionOrigin_PS4CenterPadTouch                 EInputActionOrigin = 72
+	EInputActionOrigin_PS4CenterPadSwipe                 EInputActionOrigin = 73
+	EInputActionOrigin_PS4CenterPadClick                 EInputActionOrigin = 74
+	EInputActionOrigin_PS4CenterPadDPadNorth             EInputActionOrigin = 75
+	EInputActionOrigin_PS4CenterPadDPadSouth             EInputActionOrigin = 76
+	EInputActionOrigin_PS4CenterPadDPadWest              EInputActionOrigin = 77
+	EInputActionOrigin_PS4CenterPadDPadEast              EInputActionOrigin = 78
+	EInputActionOrigin_PS4LeftTriggerPull                EInputActionOrigin = 79
+	EInputActionOrigin_PS4LeftTriggerClick               EInputActionOrigin = 80
+	EInputActionOrigin_PS4RightTriggerPull               EInputActionOrigin = 81
+	EInputActionOrigin_PS4RightTriggerClick              EInputActionOrigin = 82
+	EInputActionOrigin_PS4LeftStickMove                  EInputActionOrigin = 83
+	EInputActionOrigin_PS4LeftStickClick                 EInputActionOrigin = 84
+	EInputActionOrigin_PS4LeftStickDPadNorth             EInputActionOrigin = 85
+	EInputActionOrigin_PS4LeftStickDPadSouth             EInputActionOrigin = 86
+	EInputActionOrigin_PS4LeftStickDPadWest              EInputActionOrigin = 87
+	EInputActionOrigin_PS4LeftStickDPadEast              EInputActionOrigin = 88
+	EInputActionOrigin_PS4RightStickMove                 EInputActionOrigin = 89
+	EInputActionOrigin_PS4RightStickClick                EInputActionOrigin = 90
+	EInputActionOrigin_PS4RightStickDPadNorth            EInputActionOrigin = 91
+	EInputActionOrigin_PS4RightStickDPadSouth            EInputActionOrigin = 92
+	EInputActionOrigin_PS4RightStickDPadWest             EInputActionOrigin = 93
+	EInputActionOrigin_PS4RightStickDPadEast             EInputActionOrigin = 94
+	EInputActionOrigin_PS4DPadNorth                      EInputActionOrigin = 95
+	EInputActionOrigin_PS4DPadSouth                      EInputActionOrigin = 96
+	EInputActionOrigin_PS4DPadWest                       EInputActionOrigin = 97
+	EInputActionOrigin_PS4DPadEast                       EInputActionOrigin = 98
+	EInputActionOrigin_PS4GyroMove                       EInputActionOrigin = 99
+	EInputActionOrigin_PS4GyroPitch                      EInputActionOrigin = 100
+	EInputActionOrigin_PS4GyroYaw                        EInputActionOrigin = 101
+	EInputActionOrigin_PS4GyroRoll                       EInputActionOrigin = 102
+	EInputActionOrigin_PS4DPadMove                       EInputActionOrigin = 103
+	EInputActionOrigin_PS4Reserved1                      EInputActionOrigin = 104
+	EInputActionOrigin_PS4Reserved2                      EInputActionOrigin = 105
+	EInputActionOrigin_PS4Reserved3                      EInputActionOrigin = 106
+	EInputActionOrigin_PS4Reserved4                      EInputActionOrigin = 107
+	EInputActionOrigin_PS4Reserved5                      EInputActionOrigin = 108
+	EInputActionOrigin_PS4Reserved6                      EInputActionOrigin = 109
+	EInputActionOrigin_PS4Reserved7                      EInputActionOrigin = 110
+	EInputActionOrigin_PS4Reserved8                      EInputActionOrigin = 111
+	EInputActionOrigin_PS4Reserved9                      EInputActionOrigin = 112
+	EInputActionOrigin_PS4Reserved10                     EInputActionOrigin = 113
+	EInputActionOrigin_XBoxOneA                          EInputActionOrigin = 114
+	EInputActionOrigin_XBoxOneB                          EInputActionOrigin = 115
+	EInputActionOrigin_XBoxOneX                          EInputActionOrigin = 116
+	EInputActionOrigin_XBoxOneY                          EInputActionOrigin = 117
+	EInputActionOrigin_XBoxOneLeftBumper                 EInputActionOrigin = 118
+	EInputActionOrigin_XBoxOneRightBumper                EInputActionOrigin = 119
+	EInputActionOrigin_XBoxOneMenu                       EInputActionOrigin = 120
+	EInputActionOrigin_XBoxOneView                       EInputActionOrigin = 121
+	EInputActionOrigin_XBoxOneLeftTriggerPull            EInputActionOrigin = 122
+	EInputActionOrigin_XBoxOneLeftTriggerClick           EInputActionOrigin = 123
+	EInputActionOrigin_XBoxOneRightTriggerPull           EInputActionOrigin = 124
+	EInputActionOrigin_XBoxOneRightTriggerClick          EInputActionOrigin = 125
+	EInputActionOrigin_XBoxOneLeftStickMove              EInputActionOrigin = 126
+	EInputActionOrigin_XBoxOneLeftStickClick             EInputActionOrigin = 127
+	EInputActionOrigin_XBoxOneLeftStickDPadNorth         EInputActionOrigin = 128
+	EInputActionOrigin_XBoxOneLeftStickDPadSouth         EInputActionOrigin = 129
+	EInputActionOrigin_XBoxOneLeftStickDPadWest          EInputActionOrigin = 130
+	EInputActionOrigin_XBoxOneLeftStickDPadEast          EInputActionOrigin = 131
+	EInputActionOrigin_XBoxOneRightStickMove             EInputActionOrigin = 132
+	EInputActionOrigin_XBoxOneRightStickClick            EInputActionOrigin = 133
+	EInputActionOrigin_XBoxOneRightStickDPadNorth        EInputActionOrigin = 134
+	EInputActionOrigin_XBoxOneRightStickDPadSouth        EInputActionOrigin = 135
+	EInputActionOrigin_XBoxOneRightStickDPadWest         EInputActionOrigin = 136
+	EInputActionOrigin_XBoxOneRightStickDPadEast         EInputActionOrigin = 137
+	EInputActionOrigin_XBoxOneDPadNorth                  EInputActionOrigin = 138
+	EInputActionOrigin_XBoxOneDPadSouth                  EInputActionOrigin = 139
+	EInputActionOrigin_XBoxOneDPadWest                   EInputActionOrigin = 140
+	EInputActionOrigin_XBoxOneDPadEast                   EInputActionOrigin = 141
+	EInputActionOrigin_XBoxOneDPadMove                   EInputActionOrigin = 142
+	EInputActionOrigin_XBoxOneLeftGripLower              EInputActionOrigin = 143
+	EInputActionOrigin_XBoxOneLeftGripUpper              EInputActionOrigin = 144
+	EInputActionOrigin_XBoxOneRightGripLower             EInputActionOrigin = 145
+	EInputActionOrigin_XBoxOneRightGripUpper             EInputActionOrigin = 146
+	EInputActionOrigin_XBoxOneShare                      EInputActionOrigin = 147
+	EInputActionOrigin_XBoxOneReserved6                  EInputActionOrigin = 148
+	EInputActionOrigin_XBoxOneReserved7                  EInputActionOrigin = 149
+	EInputActionOrigin_XBoxOneReserved8                  EInputActionOrigin = 150
+	EInputActionOrigin_XBoxOneReserved9                  EInputActionOrigin = 151
+	EInputActionOrigin_XBoxOneReserved10                 EInputActionOrigin = 152
+	EInputActionOrigin_XBox360A                          EInputActionOrigin = 153
+	EInputActionOrigin_XBox360B                          EInputActionOrigin = 154
+	EInputActionOrigin_XBox360X                          EInputActionOrigin = 155
+	EInputActionOrigin_XBox360Y                          EInputActionOrigin = 156
+	EInputActionOrigin_XBox360LeftBumper                 EInputActionOrigin = 157
+	EInputActionOrigin_XBox360RightBumper                EInputActionOrigin = 158
+	EInputActionOrigin_XBox360Start                      EInputActionOrigin = 159
+	EInputActionOrigin_XBox360Back                       EInputActionOrigin = 160
+	EInputActionOrigin_XBox360LeftTriggerPull            EInputActionOrigin = 161
+	EInputActionOrigin_XBox360LeftTriggerClick           EInputActionOrigin = 162
+	EInputActionOrigin_XBox360RightTriggerPull           EInputActionOrigin = 163
+	EInputActionOrigin_XBox360RightTriggerClick          EInputActionOrigin = 164
+	EInputActionOrigin_XBox360LeftStickMove              EInputActionOrigin = 165
+	EInputActionOrigin_XBox360LeftStickClick             EInputActionOrigin = 166
+	EInputActionOrigin_XBox360LeftStickDPadNorth         EInputActionOrigin = 167
+	EInputActionOrigin_XBox360LeftStickDPadSouth         EInputActionOrigin = 168
+	EInputActionOrigin_XBox360LeftStickDPadWest          EInputActionOrigin = 169
+	EInputActionOrigin_XBox360LeftStickDPadEast          EInputActionOrigin = 170
+	EInputActionOrigin_XBox360RightStickMove             EInputActionOrigin = 171
+	EInputActionOrigin_XBox360RightStickClick            EInputActionOrigin = 172
+	EInputActionOrigin_XBox360RightStickDPadNorth        EInputActionOrigin = 173
+	EInputActionOrigin_XBox360RightStickDPadSouth        EInputActionOrigin = 174
+	EInputActionOrigin_XBox360RightStickDPadWest         EInputActionOrigin = 175
+	EInputActionOrigin_XBox360RightStickDPadEast         EInputActionOrigin = 176
+	EInputActionOrigin_XBox360DPadNorth                  EInputActionOrigin = 177
+	EInputActionOrigin_XBox360DPadSouth                  EInputActionOrigin = 178
+	EInputActionOrigin_XBox360DPadWest                   EInputActionOrigin = 179
+	EInputActionOrigin_XBox360DPadEast                   EInputActionOrigin = 180
+	EInputActionOrigin_XBox360DPadMove                   EInputActionOrigin = 181
+	EInputActionOrigin_XBox360Reserved1                  EInputActionOrigin = 182
+	EInputActionOrigin_XBox360Reserved2                  EInputActionOrigin = 183
+	EInputActionOrigin_XBox360Reserved3                  EInputActionOrigin = 184
+	EInputActionOrigin_XBox360Reserved4                  EInputActionOrigin = 185
+	EInputActionOrigin_XBox360Reserved5                  EInputActionOrigin = 186
+	EInputActionOrigin_XBox360Reserved6                  EInputActionOrigin = 187
+	EInputActionOrigin_XBox360Reserved7                  EInputActionOrigin = 188
+	EInputActionOrigin_XBox360Reserved8                  EInputActionOrigin = 189
+	EInputActionOrigin_XBox360Reserved9                  EInputActionOrigin = 190
+	EInputActionOrigin_XBox360Reserved10                 EInputActionOrigin = 191
+	EInputActionOrigin_SwitchA                           EInputActionOrigin = 192
+	EInputActionOrigin_SwitchB                           EInputActionOrigin = 193
+	EInputActionOrigin_SwitchX                           EInputActionOrigin = 194
+	EInputActionOrigin_SwitchY                           EInputActionOrigin = 195
+	EInputActionOrigin_SwitchLeftBumper                  EInputActionOrigin = 196
+	EInputActionOrigin_SwitchRightBumper                 EInputActionOrigin = 197
+	EInputActionOrigin_SwitchPlus                        EInputActionOrigin = 198
+	EInputActionOrigin_SwitchMinus                       EInputActionOrigin = 199
+	EInputActionOrigin_SwitchCapture                     EInputActionOrigin = 200
+	EInputActionOrigin_SwitchLeftTriggerPull             EInputActionOrigin = 201
+	EInputActionOrigin_SwitchLeftTriggerClick            EInputActionOrigin = 202
+	EInputActionOrigin_SwitchRightTriggerPull            EInputActionOrigin = 203
+	EInputActionOrigin_SwitchRightTriggerClick           EInputActionOrigin = 204
+	EInputActionOrigin_SwitchLeftStickMove               EInputActionOrigin = 205
+	EInputActionOrigin_SwitchLeftStickClick              EInputActionOrigin = 206
+	EInputActionOrigin_SwitchLeftStickDPadNorth          EInputActionOrigin = 207
+	EInputActionOrigin_SwitchLeftStickDPadSouth          EInputActionOrigin = 208
+	EInputActionOrigin_SwitchLeftStickDPadWest           EInputActionOrigin = 209
+	EInputActionOrigin_SwitchLeftStickDPadEast           EInputActionOrigin = 210
+	EInputActionOrigin_SwitchRightStickMove              EInputActionOrigin = 211
+	EInputActionOrigin_SwitchRightStickClick             EInputActionOrigin = 212
+	EInputActionOrigin_SwitchRightStickDPadNorth         EInputActionOrigin = 213
+	EInputActionOrigin_SwitchRightStickDPadSouth         EInputActionOrigin = 214
+	EInputActionOrigin_SwitchRightStickDPadWest          EInputActionOrigin = 215
+	EInputActionOrigin_SwitchRightStickDPadEast          EInputActionOrigin = 216
+	EInputActionOrigin_SwitchDPadNorth                   EInputActionOrigin = 217
+	EInputActionOrigin_SwitchDPadSouth                   EInputActionOrigin = 218
+	EInputActionOrigin_SwitchDPadWest                    EInputActionOrigin = 219
+	EInputActionOrigin_SwitchDPadEast                    EInputActionOrigin = 220
+	EInputActionOrigin_SwitchProGyroMove                 EInputActionOrigin = 221
+	EInputActionOrigin_SwitchProGyroPitch                EInputActionOrigin = 222
+	EInputActionOrigin_SwitchProGyroYaw                  EInputActionOrigin = 223
+	EInputActionOrigin_SwitchProGyroRoll                 EInputActionOrigin = 224
+	EInputActionOrigin_SwitchDPadMove                    EInputActionOrigin = 225
+	EInputActionOrigin_SwitchReserved1                   EInputActionOrigin = 226
+	EInputActionOrigin_SwitchReserved2                   EInputActionOrigin = 227
+	EInputActionOrigin_SwitchReserved3                   EInputActionOrigin = 228
+	EInputActionOrigin_SwitchReserved4                   EInputActionOrigin = 229
+	EInputActionOrigin_SwitchReserved5                   EInputActionOrigin = 230
+	EInputActionOrigin_SwitchReserved6                   EInputActionOrigin = 231
+	EInputActionOrigin_SwitchReserved7                   EInputActionOrigin = 232
+	EInputActionOrigin_SwitchReserved8                   EInputActionOrigin = 233
+	EInputActionOrigin_SwitchReserved9                   EInputActionOrigin = 234
+	EInputActionOrigin_SwitchReserved10                  EInputActionOrigin = 235
+	EInputActionOrigin_SwitchRightGyroMove               EInputActionOrigin = 236
+	EInputActionOrigin_SwitchRightGyroPitch              EInputActionOrigin = 237
+	EInputActionOrigin_SwitchRightGyroYaw                EInputActionOrigin = 238
+	EInputActionOrigin_SwitchRightGyroRoll               EInputActionOrigin = 239
+	EInputActionOrigin_SwitchLeftGyroMove                EInputActionOrigin = 240
+	EInputActionOrigin_SwitchLeftGyroPitch               EInputActionOrigin = 241
+	EInputActionOrigin_SwitchLeftGyroYaw                 EInputActionOrigin = 242
+	EInputActionOrigin_SwitchLeftGyroRoll                EInputActionOrigin = 243
+	EInputActionOrigin_SwitchLeftGripLower               EInputActionOrigin = 244
+	EInputActionOrigin_SwitchLeftGripUpper               EInputActionOrigin = 245
+	EInputActionOrigin_SwitchRightGripLower              EInputActionOrigin = 246
+	EInputActionOrigin_SwitchRightGripUpper              EInputActionOrigin = 247
+	EInputActionOrigin_SwitchJoyConButtonN               EInputActionOrigin = 248
+	EInputActionOrigin_SwitchJoyConButtonE               EInputActionOrigin = 249
+	EInputActionOrigin_SwitchJoyConButtonS               EInputActionOrigin = 250
+	EInputActionOrigin_SwitchJoyConButtonW               EInputActionOrigin = 251
+	EInputActionOrigin_SwitchReserved15                  EInputActionOrigin = 252
+	EInputActionOrigin_SwitchReserved16                  EInputActionOrigin = 253
+	EInputActionOrigin_SwitchReserved17                  EInputActionOrigin = 254
+	EInputActionOrigin_SwitchReserved18                  EInputActionOrigin = 255
+	EInputActionOrigin_SwitchReserved19                  EInputActionOrigin = 256
+	EInputActionOrigin_SwitchReserved20                  EInputActionOrigin = 257
+	EInputActionOrigin_PS5X                              EInputActionOrigin = 258
+	EInputActionOrigin_PS5Circle                         EInputActionOrigin = 259
+	EInputActionOrigin_PS5Triangle                       EInputActionOrigin = 260
+	EInputActionOrigin_PS5Square                         EInputActionOrigin = 261
+	EInputActionOrigin_PS5LeftBumper                     EInputActionOrigin = 262
+	EInputActionOrigin_PS5RightBumper                    EInputActionOrigin = 263
+	EInputActionOrigin_PS5Option                         EInputActionOrigin = 264
+	EInputActionOrigin_PS5Create                         EInputActionOrigin = 265
+	EInputActionOrigin_PS5Mute                           EInputActionOrigin = 266
+	EInputActionOrigin_PS5LeftPadTouch                   EInputActionOrigin = 267
+	EInputActionOrigin_PS5LeftPadSwipe                   EInputActionOrigin = 268
+	EInputActionOrigin_PS5LeftPadClick                   EInputActionOrigin = 269
+	EInputActionOrigin_PS5LeftPadDPadNorth               EInputActionOrigin = 270
+	EInputActionOrigin_PS5LeftPadDPadSouth               EInputActionOrigin = 271
+	EInputActionOrigin_PS5LeftPadDPadWest                EInputActionOrigin = 272
+	EInputActionOrigin_PS5LeftPadDPadEast                EInputActionOrigin = 273
+	EInputActionOrigin_PS5RightPadTouch                  EInputActionOrigin = 274
+	EInputActionOrigin_PS5RightPadSwipe                  EInputActionOrigin = 275
+	EInputActionOrigin_PS5RightPadClick                  EInputActionOrigin = 276
+	EInputActionOrigin_PS5RightPadDPadNorth              EInputActionOrigin = 277
+	EInputActionOrigin_PS5RightPadDPadSouth              EInputActionOrigin = 278
+	EInputActionOrigin_PS5RightPadDPadWest               EInputActionOrigin = 279
+	EInputActionOrigin_PS5RightPadDPadEast               EInputActionOrigin = 280
+	EInputActionOrigin_PS5CenterPadTouch                 EInputActionOrigin = 281
+	EInputActionOrigin_PS5CenterPadSwipe                 EInputActionOrigin = 282
+	EInputActionOrigin_PS5CenterPadClick                 EInputActionOrigin = 283
+	EInputActionOrigin_PS5CenterPadDPadNorth             EInputActionOrigin = 284
+	EInputActionOrigin_PS5CenterPadDPadSouth             EInputActionOrigin = 285
+	EInputActionOrigin_PS5CenterPadDPadWest              EInputActionOrigin = 286
+	EInputActionOrigin_PS5CenterPadDPadEast              EInputActionOrigin = 287
+	EInputActionOrigin_PS5LeftTriggerPull                EInputActionOrigin = 288
+	EInputActionOrigin_PS5LeftTriggerClick               EInputActionOrigin = 289
+	EInputActionOrigin_PS5RightTriggerPull               EInputActionOrigin = 290
+	EInputActionOrigin_PS5RightTriggerClick              EInputActionOrigin = 291
+	EInputActionOrigin_PS5LeftStickMove                  EInputActionOrigin = 292
+	EInputActionOrigin_PS5LeftStickClick                 EInputActionOrigin = 293
+	EInputActionOrigin_PS5LeftStickDPadNorth             EInputActionOrigin = 294
+	EInputActionOrigin_PS5LeftStickDPadSouth             EInputActionOrigin = 295
+	EInputActionOrigin_PS5LeftStickDPadWest              EInputActionOrigin = 296
+	EInputActionOrigin_PS5LeftStickDPadEast              EInputActionOrigin = 297
+	EInputActionOrigin_PS5RightStickMove                 EInputActionOrigin = 298
+	EInputActionOrigin_PS5RightStickClick                EInputActionOrigin = 299
+	EInputActionOrigin_PS5RightStickDPadNorth            EInputActionOrigin = 300
+	EInputActionOrigin_PS5RightStickDPadSouth            EInputActionOrigin = 301
+	EInputActionOrigin_PS5RightStickDPadWest             EInputActionOrigin = 302
+	EInputActionOrigin_PS5RightStickDPadEast             EInputActionOrigin = 303
+	EInputActionOrigin_PS5DPadNorth                      EInputActionOrigin = 304
+	EInputActionOrigin_PS5DPadSouth                      EInputActionOrigin = 305
+	EInputActionOrigin_PS5DPadWest                       EInputActionOrigin = 306
+	EInputActionOrigin_PS5DPadEast                       EInputActionOrigin = 307
+	EInputActionOrigin_PS5GyroMove                       EInputActionOrigin = 308
+	EInputActionOrigin_PS5GyroPitch                      EInputActionOrigin = 309
+	EInputActionOrigin_PS5GyroYaw                        EInputActionOrigin = 310
+	EInputActionOrigin_PS5GyroRoll                       EInputActionOrigin = 311
+	EInputActionOrigin_PS5DPadMove                       EInputActionOrigin = 312
+	EInputActionOrigin_PS5LeftGrip                       EInputActionOrigin = 313
+	EInputActionOrigin_PS5RightGrip                      EInputActionOrigin = 314
+	EInputActionOrigin_PS5LeftFn                         EInputActionOrigin = 315
+	EInputActionOrigin_PS5RightFn                        EInputActionOrigin = 316
+	EInputActionOrigin_PS5Reserved5                      EInputActionOrigin = 317
+	EInputActionOrigin_PS5Reserved6                      EInputActionOrigin = 318
+	EInputActionOrigin_PS5Reserved7                      EInputActionOrigin = 319
+	EInputActionOrigin_PS5Reserved8                      EInputActionOrigin = 320
+	EInputActionOrigin_PS5Reserved9                      EInputActionOrigin = 321
+	EInputActionOrigin_PS5Reserved10                     EInputActionOrigin = 322
+	EInputActionOrigin_PS5Reserved11                     EInputActionOrigin = 323
+	EInputActionOrigin_PS5Reserved12                     EInputActionOrigin = 324
+	EInputActionOrigin_PS5Reserved13                     EInputActionOrigin = 325
+	EInputActionOrigin_PS5Reserved14                     EInputActionOrigin = 326
+	EInputActionOrigin_PS5Reserved15                     EInputActionOrigin = 327
+	EInputActionOrigin_PS5Reserved16                     EInputActionOrigin = 328
+	EInputActionOrigin_PS5Reserved17                     EInputActionOrigin = 329
+	EInputActionOrigin_PS5Reserved18                     EInputActionOrigin = 330
+	EInputActionOrigin_PS5Reserved19                     EInputActionOrigin = 331
+	EInputActionOrigin_PS5Reserved20                     EInputActionOrigin = 332
+	EInputActionOrigin_SteamDeckA                        EInputActionOrigin = 333
+	EInputActionOrigin_SteamDeckB                        EInputActionOrigin = 334
+	EInputActionOrigin_SteamDeckX                        EInputActionOrigin = 335
+	EInputActionOrigin_SteamDeckY                        EInputActionOrigin = 336
+	EInputActionOrigin_SteamDeckL1                       EInputActionOrigin = 337
+	EInputActionOrigin_SteamDeckR1                       EInputActionOrigin = 338
+	EInputActionOrigin_SteamDeckMenu                     EInputActionOrigin = 339
+	EInputActionOrigin_SteamDeckView                     EInputActionOrigin = 340
+	EInputActionOrigin_SteamDeckLeftPadTouch             EInputActionOrigin = 341
+	EInputActionOrigin_SteamDeckLeftPadSwipe             EInputActionOrigin = 342
+	EInputActionOrigin_SteamDeckLeftPadClick             EInputActionOrigin = 343
+	EInputActionOrigin_SteamDeckLeftPadDPadNorth         EInputActionOrigin = 344
+	EInputActionOrigin_SteamDeckLeftPadDPadSouth         EInputActionOrigin = 345
+	EInputActionOrigin_SteamDeckLeftPadDPadWest          EInputActionOrigin = 346
+	EInputActionOrigin_SteamDeckLeftPadDPadEast          EInputActionOrigin = 347
+	EInputActionOrigin_SteamDeckRightPadTouch            EInputActionOrigin = 348
+	EInputActionOrigin_SteamDeckRightPadSwipe            EInputActionOrigin = 349
+	EInputActionOrigin_SteamDeckRightPadClick            EInputActionOrigin = 350
+	EInputActionOrigin_SteamDeckRightPadDPadNorth        EInputActionOrigin = 351
+	EInputActionOrigin_SteamDeckRightPadDPadSouth        EInputActionOrigin = 352
+	EInputActionOrigin_SteamDeckRightPadDPadWest         EInputActionOrigin = 353
+	EInputActionOrigin_SteamDeckRightPadDPadEast         EInputActionOrigin = 354
+	EInputActionOrigin_SteamDeckL2SoftPull               EInputActionOrigin = 355
+	EInputActionOrigin_SteamDeckL2                       EInputActionOrigin = 356
+	EInputActionOrigin_SteamDeckR2SoftPull               EInputActionOrigin = 357
+	EInputActionOrigin_SteamDeckR2                       EInputActionOrigin = 358
+	EInputActionOrigin_SteamDeckLeftStickMove            EInputActionOrigin = 359
+	EInputActionOrigin_SteamDeckL3                       EInputActionOrigin = 360
+	EInputActionOrigin_SteamDeckLeftStickDPadNorth       EInputActionOrigin = 361
+	EInputActionOrigin_SteamDeckLeftStickDPadSouth       EInputActionOrigin = 362
+	EInputActionOrigin_SteamDeckLeftStickDPadWest        EInputActionOrigin = 363
+	EInputActionOrigin_SteamDeckLeftStickDPadEast        EInputActionOrigin = 364
+	EInputActionOrigin_SteamDeckLeftStickTouch           EInputActionOrigin = 365
+	EInputActionOrigin_SteamDeckRightStickMove           EInputActionOrigin = 366
+	EInputActionOrigin_SteamDeckR3                       EInputActionOrigin = 367
+	EInputActionOrigin_SteamDeckRightStickDPadNorth      EInputActionOrigin = 368
+	EInputActionOrigin_SteamDeckRightStickDPadSouth      EInputActionOrigin = 369
+	EInputActionOrigin_SteamDeckRightStickDPadWest       EInputActionOrigin = 370
+	EInputActionOrigin_SteamDeckRightStickDPadEast       EInputActionOrigin = 371
+	EInputActionOrigin_SteamDeckRightStickTouch          EInputActionOrigin = 372
+	EInputActionOrigin_SteamDeckL4                       EInputActionOrigin = 373
+	EInputActionOrigin_SteamDeckR4                       EInputActionOrigin = 374
+	EInputActionOrigin_SteamDeckL5                       EInputActionOrigin = 375
+	EInputActionOrigin_SteamDeckR5                       EInputActionOrigin = 376
+	EInputActionOrigin_SteamDeckDPadMove                 EInputActionOrigin = 377
+	EInputActionOrigin_SteamDeckDPadNorth                EInputActionOrigin = 378
+	EInputActionOrigin_SteamDeckDPadSouth                EInputActionOrigin = 379
+	EInputActionOrigin_SteamDeckDPadWest                 EInputActionOrigin = 380
+	EInputActionOrigin_SteamDeckDPadEast                 EInputActionOrigin = 381
+	EInputActionOrigin_SteamDeckGyroMove                 EInputActionOrigin = 382
+	EInputActionOrigin_SteamDeckGyroPitch                EInputActionOrigin = 383
+	EInputActionOrigin_SteamDeckGyroYaw                  EInputActionOrigin = 384
+	EInputActionOrigin_SteamDeckGyroRoll                 EInputActionOrigin = 385
+	EInputActionOrigin_SteamDeckReserved1                EInputActionOrigin = 386
+	EInputActionOrigin_SteamDeckReserved2                EInputActionOrigin = 387
+	EInputActionOrigin_SteamDeckReserved3                EInputActionOrigin = 388
+	EInputActionOrigin_SteamDeckReserved4                EInputActionOrigin = 389
+	EInputActionOrigin_SteamDeckReserved5                EInputActionOrigin = 390
+	EInputActionOrigin_SteamDeckReserved6                EInputActionOrigin = 391
+	EInputActionOrigin_SteamDeckReserved7                EInputActionOrigin = 392
+	EInputActionOrigin_SteamDeckReserved8                EInputActionOrigin = 393
+	EInputActionOrigin_SteamDeckReserved9                EInputActionOrigin = 394
+	EInputActionOrigin_SteamDeckReserved10               EInputActionOrigin = 395
+	EInputActionOrigin_SteamDeckReserved11               EInputActionOrigin = 396
+	EInputActionOrigin_SteamDeckReserved12               EInputActionOrigin = 397
+	EInputActionOrigin_SteamDeckReserved13               EInputActionOrigin = 398
+	EInputActionOrigin_SteamDeckReserved14               EInputActionOrigin = 399
+	EInputActionOrigin_SteamDeckReserved15               EInputActionOrigin = 400
+	EInputActionOrigin_SteamDeckReserved16               EInputActionOrigin = 401
+	EInputActionOrigin_SteamDeckReserved17               EInputActionOrigin = 402
+	EInputActionOrigin_SteamDeckReserved18               EInputActionOrigin = 403
+	EInputActionOrigin_SteamDeckReserved19               EInputActionOrigin = 404
+	EInputActionOrigin_SteamDeckReserved20               EInputActionOrigin = 405
+	EInputActionOrigin_HoripadM1                         EInputActionOrigin = 406
+	EInputActionOrigin_HoripadM2                         EInputActionOrigin = 407
+	EInputActionOrigin_HoripadL4                         EInputActionOrigin = 408
+	EInputActionOrigin_HoripadR4                         EInputActionOrigin = 409
+	EInputActionOrigin_Count                             EInputActionOrigin = 410
+	EInputActionOrigin_MaximumPossibleValue              EInputActionOrigin = 32767
 )
 
-type InputHandle uint64
+type InputHandle_t uint64
 type SteamInputActionEventCallbackPointer uintptr
 type InputActionSetHandle uint64
 type InputDigitalActionHandle uint64
@@ -2086,23 +2082,23 @@ type InputAnalogActionHandle uint64
 type ESteamInputType int32
 
 const (
-	ESteamInputTypeUnknown              ESteamInputType = 0
-	ESteamInputTypeSteamController      ESteamInputType = 1
-	ESteamInputTypeXBox360Controller    ESteamInputType = 2
-	ESteamInputTypeXBoxOneController    ESteamInputType = 3
-	ESteamInputTypeGenericGamepad       ESteamInputType = 4
-	ESteamInputTypePS4Controller        ESteamInputType = 5
-	ESteamInputTypeAppleMFiController   ESteamInputType = 6
-	ESteamInputTypeAndroidController    ESteamInputType = 7
-	ESteamInputTypeSwitchJoyConPair     ESteamInputType = 8
-	ESteamInputTypeSwitchJoyConSingle   ESteamInputType = 9
-	ESteamInputTypeSwitchProController  ESteamInputType = 10
-	ESteamInputTypeMobileTouch          ESteamInputType = 11
-	ESteamInputTypePS3Controller        ESteamInputType = 12
-	ESteamInputTypePS5Controller        ESteamInputType = 13
-	ESteamInputTypeSteamDeckController  ESteamInputType = 14
-	ESteamInputTypeCount                ESteamInputType = 15
-	ESteamInputTypeMaximumPossibleValue ESteamInputType = 255
+	ESteamInputType_Unknown              ESteamInputType = 0
+	ESteamInputType_SteamController      ESteamInputType = 1
+	ESteamInputType_XBox360Controller    ESteamInputType = 2
+	ESteamInputType_XBoxOneController    ESteamInputType = 3
+	ESteamInputType_GenericGamepad       ESteamInputType = 4
+	ESteamInputType_PS4Controller        ESteamInputType = 5
+	ESteamInputType_AppleMFiController   ESteamInputType = 6
+	ESteamInputType_AndroidController    ESteamInputType = 7
+	ESteamInputType_SwitchJoyConPair     ESteamInputType = 8
+	ESteamInputType_SwitchJoyConSingle   ESteamInputType = 9
+	ESteamInputType_SwitchProController  ESteamInputType = 10
+	ESteamInputType_MobileTouch          ESteamInputType = 11
+	ESteamInputType_PS3Controller        ESteamInputType = 12
+	ESteamInputType_PS5Controller        ESteamInputType = 13
+	ESteamInputType_SteamDeckController  ESteamInputType = 14
+	ESteamInputType_Count                ESteamInputType = 15
+	ESteamInputType_MaximumPossibleValue ESteamInputType = 255
 )
 
 const (
@@ -2165,53 +2161,53 @@ var (
 	iSteamInput_RunFrame                             func(steamInput uintptr, reservedValue bool)
 	iSteamInput_BWaitForData                         func(steamInput uintptr, waitForever bool, timeout uint32) bool
 	iSteamInput_BNewDataAvailable                    func(steamInput uintptr) bool
-	iSteamInput_GetConnectedControllers              func(steamInput uintptr, handlesOut *[STEAM_INPUT_MAX_COUNT]InputHandle) int32
+	iSteamInput_GetConnectedControllers              func(steamInput uintptr, handlesOut *[_STEAM_INPUT_MAX_COUNT]InputHandle_t) int32
 	iSteamInput_EnableDeviceCallbacks                func(steamInput uintptr)
 	iSteamInput_EnableActionEventCallbacks           func(steamInput uintptr, pCallback SteamInputActionEventCallbackPointer)
 	iSteamInput_GetActionSetHandle                   func(steamInput uintptr, pszActionSetName string) InputActionSetHandle
-	iSteamInput_ActivateActionSet                    func(steamInput uintptr, inputHandle InputHandle, actionSetHandle InputActionSetHandle)
-	iSteamInput_GetCurrentActionSet                  func(steamInput uintptr, inputHandle InputHandle) InputActionSetHandle
-	iSteamInput_ActivateActionSetLayer               func(steamInput uintptr, inputHandle InputHandle, actionSetLayerHandle InputActionSetHandle)
-	iSteamInput_DeactivateActionSetLayer             func(steamInput uintptr, inputHandle InputHandle, actionSetLayerHandle InputActionSetHandle)
-	iSteamInput_DeactivateAllActionSetLayers         func(steamInput uintptr, inputHandle InputHandle)
-	iSteamInput_GetActiveActionSetLayers             func(steamInput uintptr, inputHandle InputHandle, handlesOut *[STEAM_INPUT_MAX_ACTIVE_LAYERS]InputActionSetHandle) int32
+	iSteamInput_ActivateActionSet                    func(steamInput uintptr, inputHandle InputHandle_t, actionSetHandle InputActionSetHandle)
+	iSteamInput_GetCurrentActionSet                  func(steamInput uintptr, inputHandle InputHandle_t) InputActionSetHandle
+	iSteamInput_ActivateActionSetLayer               func(steamInput uintptr, inputHandle InputHandle_t, actionSetLayerHandle InputActionSetHandle)
+	iSteamInput_DeactivateActionSetLayer             func(steamInput uintptr, inputHandle InputHandle_t, actionSetLayerHandle InputActionSetHandle)
+	iSteamInput_DeactivateAllActionSetLayers         func(steamInput uintptr, inputHandle InputHandle_t)
+	iSteamInput_GetActiveActionSetLayers             func(steamInput uintptr, inputHandle InputHandle_t, handlesOut *[_STEAM_INPUT_MAX_ACTIVE_LAYERS]InputActionSetHandle) int32
 	iSteamInput_GetDigitalActionHandle               func(steamInput uintptr, actionName string) InputDigitalActionHandle
-	iSteamInput_GetDigitalActionData                 func(steamInput uintptr, inputHandle InputHandle, digitalActionHandle InputDigitalActionHandle) uintptr
-	iSteamInput_GetDigitalActionOrigins              func(steamInput uintptr, inputHandle InputHandle, actionSetHandle InputActionSetHandle, digitalActionHandle InputDigitalActionHandle, originsOut *[STEAM_INPUT_MAX_ORIGINS]EInputActionOrigin) int32
+	iSteamInput_GetDigitalActionData                 func(steamInput uintptr, inputHandle InputHandle_t, digitalActionHandle InputDigitalActionHandle) uintptr
+	iSteamInput_GetDigitalActionOrigins              func(steamInput uintptr, inputHandle InputHandle_t, actionSetHandle InputActionSetHandle, digitalActionHandle InputDigitalActionHandle, originsOut *[_STEAM_INPUT_MAX_ORIGINS]EInputActionOrigin) int32
 	iSteamInput_GetStringForDigitalActionName        func(steamInput uintptr, actionHandle InputDigitalActionHandle) string
 	iSteamInput_GetAnalogActionHandle                func(steamInput uintptr, actionName string) InputAnalogActionHandle
-	iSteamInput_GetAnalogActionData                  func(steamInput uintptr, inputHandle InputHandle, analogActionHandle InputAnalogActionHandle) uintptr
-	iSteamInput_GetAnalogActionOrigins               func(steamInput uintptr, inputHandle InputHandle, actionSetHandle InputActionSetHandle, analogActionHandle InputAnalogActionHandle, originsOut *[STEAM_INPUT_MAX_ORIGINS]EInputActionOrigin) int32
+	iSteamInput_GetAnalogActionData                  func(steamInput uintptr, inputHandle InputHandle_t, analogActionHandle InputAnalogActionHandle) uintptr
+	iSteamInput_GetAnalogActionOrigins               func(steamInput uintptr, inputHandle InputHandle_t, actionSetHandle InputActionSetHandle, analogActionHandle InputAnalogActionHandle, originsOut *[_STEAM_INPUT_MAX_ORIGINS]EInputActionOrigin) int32
 	iSteamInput_GetGlyphPNGForActionOrigin           func(steamInput uintptr, eOrigin EInputActionOrigin, size ESteamInputGlyphSize, flags uint32) []byte
 	iSteamInput_GetGlyphSVGForActionOrigin           func(steamInput uintptr, eOrigin EInputActionOrigin, flags uint32) []byte
 	iSteamInput_GetGlyphForActionOrigin_Legacy       func(steamInput uintptr, eOrigin EInputActionOrigin) []byte
 	iSteamInput_GetStringForActionOrigin             func(steamInput uintptr, eOrigin EInputActionOrigin) string
 	iSteamInput_GetStringForAnalogActionName         func(steamInput uintptr, actionHandle InputAnalogActionHandle) string
-	iSteamInput_StopAnalogActionMomentum             func(steamInput uintptr, inputHandle InputHandle, action InputAnalogActionHandle)
-	iSteamInput_GetMotionData                        func(steamInput uintptr, inputHandle InputHandle) uintptr
-	iSteamInput_TriggerVibration                     func(steamInput uintptr, inputHandle InputHandle, leftSpeed uint16, rightSpeed uint16)
-	iSteamInput_TriggerVibrationExtended             func(steamInput uintptr, inputHandle InputHandle, leftSpeed uint16, rightSpeed uint16, leftTriggerSpeed uint16, rightTriggerSpeed uint16)
-	iSteamInput_TriggerSimpleHapticEvent             func(steamInput uintptr, inputHandle InputHandle, eHapticLocation EControllerHapticLocation, intensity uint8, gainDB byte, otherIntensity uint8, otherGainDB byte)
-	iSteamInput_SetLEDColor                          func(steamInput uintptr, inputHandle InputHandle, colorR uint8, colorG uint8, colorB uint8, flags uint)
-	iSteamInput_Legacy_TriggerHapticPulse            func(steamInput uintptr, inputHandle InputHandle, targetPad ESteamControllerPad, durationMicroSec uint16)
-	iSteamInput_Legacy_TriggerRepeatedHapticPulse    func(steamInput uintptr, inputHandle InputHandle, targetPad ESteamControllerPad, durationMicroSec uint16, offMicroSec uint16, repeat uint16, flags uint)
-	iSteamInput_ShowBindingPanel                     func(steamInput uintptr, inputHandle InputHandle) bool
-	iSteamInput_GetInputTypeForHandle                func(steamInput uintptr, inputHandle InputHandle) ESteamInputType
-	iSteamInput_GetControllerForGamepadIndex         func(steamInput uintptr, index int32) InputHandle
-	iSteamInput_GetGamepadIndexForController         func(steamInput uintptr, inputHandle InputHandle) int32
+	iSteamInput_StopAnalogActionMomentum             func(steamInput uintptr, inputHandle InputHandle_t, action InputAnalogActionHandle)
+	iSteamInput_GetMotionData                        func(steamInput uintptr, inputHandle InputHandle_t) uintptr
+	iSteamInput_TriggerVibration                     func(steamInput uintptr, inputHandle InputHandle_t, leftSpeed uint16, rightSpeed uint16)
+	iSteamInput_TriggerVibrationExtended             func(steamInput uintptr, inputHandle InputHandle_t, leftSpeed uint16, rightSpeed uint16, leftTriggerSpeed uint16, rightTriggerSpeed uint16)
+	iSteamInput_TriggerSimpleHapticEvent             func(steamInput uintptr, inputHandle InputHandle_t, eHapticLocation EControllerHapticLocation, intensity uint8, gainDB byte, otherIntensity uint8, otherGainDB byte)
+	iSteamInput_SetLEDColor                          func(steamInput uintptr, inputHandle InputHandle_t, colorR uint8, colorG uint8, colorB uint8, flags uint)
+	iSteamInput_Legacy_TriggerHapticPulse            func(steamInput uintptr, inputHandle InputHandle_t, targetPad ESteamControllerPad, durationMicroSec uint16)
+	iSteamInput_Legacy_TriggerRepeatedHapticPulse    func(steamInput uintptr, inputHandle InputHandle_t, targetPad ESteamControllerPad, durationMicroSec uint16, offMicroSec uint16, repeat uint16, flags uint)
+	iSteamInput_ShowBindingPanel                     func(steamInput uintptr, inputHandle InputHandle_t) bool
+	iSteamInput_GetInputTypeForHandle                func(steamInput uintptr, inputHandle InputHandle_t) ESteamInputType
+	iSteamInput_GetControllerForGamepadIndex         func(steamInput uintptr, index int32) InputHandle_t
+	iSteamInput_GetGamepadIndexForController         func(steamInput uintptr, inputHandle InputHandle_t) int32
 	iSteamInput_GetStringForXboxOrigin               func(steamInput uintptr, eOrigin EXboxOrigin) string
 	iSteamInput_GetGlyphForXboxOrigin                func(steamInput uintptr, eOrigin EXboxOrigin) []byte
-	iSteamInput_GetActionOriginFromXboxOrigin        func(steamInput uintptr, inputHandle InputHandle, eOrigin EXboxOrigin) EInputActionOrigin
+	iSteamInput_GetActionOriginFromXboxOrigin        func(steamInput uintptr, inputHandle InputHandle_t, eOrigin EXboxOrigin) EInputActionOrigin
 	iSteamInput_TranslateActionOrigin                func(steamInput uintptr, destinationInputType ESteamInputType, sourceOrigin EInputActionOrigin) EInputActionOrigin
-	iSteamInput_GetDeviceBindingRevision             func(steamInput uintptr, inputHandle InputHandle, major *int32, minor *int32) bool
-	iSteamInput_GetRemotePlaySessionID               func(steamInput uintptr, inputHandle InputHandle) uint32
+	iSteamInput_GetDeviceBindingRevision             func(steamInput uintptr, inputHandle InputHandle_t, major *int32, minor *int32) bool
+	iSteamInput_GetRemotePlaySessionID               func(steamInput uintptr, inputHandle InputHandle_t) uint32
 	iSteamInput_GetSessionInputConfigurationSettings func(steamInput uintptr) uint16
-	iSteamInput_SetDualSenseTriggerEffect            func(steamInput uintptr, inputHandle InputHandle, param *ScePadTriggerEffectParam)
+	iSteamInput_SetDualSenseTriggerEffect            func(steamInput uintptr, inputHandle InputHandle_t, param *ScePadTriggerEffectParam)
 )
 
 type steamInput uintptr
 
-func SteamInput() steamInput {
+func SteamInput() ISteamInput {
 	return steamInput(steamInput_init())
 }
 
@@ -2227,7 +2223,11 @@ func (s steamInput) SetInputActionManifestFilePath(inputActionManifestAbsolutePa
 	return iSteamInput_SetInputActionManifestFilePath(uintptr(s), inputActionManifestAbsolutePath)
 }
 
-func (s steamInput) RunFrame(reservedValue bool) {
+func (s steamInput) RunFrame() {
+	iSteamInput_RunFrame(uintptr(s), false)
+}
+
+func (s steamInput) RunFrameEx(reservedValue bool) {
 	iSteamInput_RunFrame(uintptr(s), reservedValue)
 }
 
@@ -2239,8 +2239,8 @@ func (s steamInput) BNewDataAvailable() bool {
 	return iSteamInput_BNewDataAvailable(uintptr(s))
 }
 
-func (s steamInput) GetConnectedControllers() []InputHandle {
-	var handlesOut [STEAM_INPUT_MAX_COUNT]InputHandle
+func (s steamInput) GetConnectedControllers() []InputHandle_t {
+	var handlesOut [_STEAM_INPUT_MAX_COUNT]InputHandle_t
 	result := iSteamInput_GetConnectedControllers(uintptr(s), &handlesOut)
 	return handlesOut[:result]
 }
@@ -2257,28 +2257,28 @@ func (s steamInput) GetActionSetHandle(pszActionSetName string) InputActionSetHa
 	return iSteamInput_GetActionSetHandle(uintptr(s), pszActionSetName)
 }
 
-func (s steamInput) ActivateActionSet(inputHandle InputHandle, actionSetHandle InputActionSetHandle) {
+func (s steamInput) ActivateActionSet(inputHandle InputHandle_t, actionSetHandle InputActionSetHandle) {
 	iSteamInput_ActivateActionSet(uintptr(s), inputHandle, actionSetHandle)
 }
 
-func (s steamInput) GetCurrentActionSet(inputHandle InputHandle) InputActionSetHandle {
+func (s steamInput) GetCurrentActionSet(inputHandle InputHandle_t) InputActionSetHandle {
 	return iSteamInput_GetCurrentActionSet(uintptr(s), inputHandle)
 }
 
-func (s steamInput) ActivateActionSetLayer(inputHandle InputHandle, actionSetLayerHandle InputActionSetHandle) {
+func (s steamInput) ActivateActionSetLayer(inputHandle InputHandle_t, actionSetLayerHandle InputActionSetHandle) {
 	iSteamInput_ActivateActionSetLayer(uintptr(s), inputHandle, actionSetLayerHandle)
 }
 
-func (s steamInput) DeactivateActionSetLayer(inputHandle InputHandle, actionSetLayerHandle InputActionSetHandle) {
+func (s steamInput) DeactivateActionSetLayer(inputHandle InputHandle_t, actionSetLayerHandle InputActionSetHandle) {
 	iSteamInput_DeactivateActionSetLayer(uintptr(s), inputHandle, actionSetLayerHandle)
 }
 
-func (s steamInput) DeactivateAllActionSetLayers(inputHandle InputHandle) {
+func (s steamInput) DeactivateAllActionSetLayers(inputHandle InputHandle_t) {
 	iSteamInput_DeactivateAllActionSetLayers(uintptr(s), inputHandle)
 }
 
-func (s steamInput) GetActiveActionSetLayers(inputHandle InputHandle) []InputActionSetHandle {
-	var handlesOut [STEAM_INPUT_MAX_ACTIVE_LAYERS]InputActionSetHandle
+func (s steamInput) GetActiveActionSetLayers(inputHandle InputHandle_t) []InputActionSetHandle {
+	var handlesOut [_STEAM_INPUT_MAX_ACTIVE_LAYERS]InputActionSetHandle
 	result := iSteamInput_GetActiveActionSetLayers(uintptr(s), inputHandle, &handlesOut)
 	return handlesOut[:result]
 }
@@ -2287,12 +2287,12 @@ func (s steamInput) GetDigitalActionHandle(actionName string) InputDigitalAction
 	return iSteamInput_GetDigitalActionHandle(uintptr(s), actionName)
 }
 
-func (s steamInput) GetDigitalActionData(inputHandle InputHandle, digitalActionHandle InputDigitalActionHandle) InputDigitalActionData {
+func (s steamInput) GetDigitalActionData(inputHandle InputHandle_t, digitalActionHandle InputDigitalActionHandle) InputDigitalActionData {
 	return *uintptrToStruct[InputDigitalActionData](iSteamInput_GetDigitalActionData(uintptr(s), inputHandle, digitalActionHandle))
 }
 
-func (s steamInput) GetDigitalActionOrigins(inputHandle InputHandle, actionSetHandle InputActionSetHandle, digitalActionHandle InputDigitalActionHandle) []EInputActionOrigin {
-	var originsOut [STEAM_INPUT_MAX_ORIGINS]EInputActionOrigin
+func (s steamInput) GetDigitalActionOrigins(inputHandle InputHandle_t, actionSetHandle InputActionSetHandle, digitalActionHandle InputDigitalActionHandle) []EInputActionOrigin {
+	var originsOut [_STEAM_INPUT_MAX_ORIGINS]EInputActionOrigin
 	result := iSteamInput_GetDigitalActionOrigins(uintptr(s), inputHandle, actionSetHandle, digitalActionHandle, &originsOut)
 	return originsOut[:result]
 }
@@ -2305,12 +2305,12 @@ func (s steamInput) GetAnalogActionHandle(actionName string) InputAnalogActionHa
 	return iSteamInput_GetAnalogActionHandle(uintptr(s), actionName)
 }
 
-func (s steamInput) GetAnalogActionData(inputHandle InputHandle, analogActionHandle InputAnalogActionHandle) InputAnalogActionData {
+func (s steamInput) GetAnalogActionData(inputHandle InputHandle_t, analogActionHandle InputAnalogActionHandle) InputAnalogActionData {
 	return *uintptrToStruct[InputAnalogActionData](iSteamInput_GetAnalogActionData(uintptr(s), inputHandle, analogActionHandle))
 }
 
-func (s steamInput) GetAnalogActionOrigins(inputHandle InputHandle, actionSetHandle InputActionSetHandle, analogActionHandle InputAnalogActionHandle) []EInputActionOrigin {
-	var originsOut [STEAM_INPUT_MAX_ORIGINS]EInputActionOrigin
+func (s steamInput) GetAnalogActionOrigins(inputHandle InputHandle_t, actionSetHandle InputActionSetHandle, analogActionHandle InputAnalogActionHandle) []EInputActionOrigin {
+	var originsOut [_STEAM_INPUT_MAX_ORIGINS]EInputActionOrigin
 	result := iSteamInput_GetAnalogActionOrigins(uintptr(s), inputHandle, actionSetHandle, analogActionHandle, &originsOut)
 	return originsOut[:result]
 }
@@ -2335,51 +2335,51 @@ func (s steamInput) GetStringForAnalogActionName(actionHandle InputAnalogActionH
 	return iSteamInput_GetStringForAnalogActionName(uintptr(s), actionHandle)
 }
 
-func (s steamInput) StopAnalogActionMomentum(inputHandle InputHandle, action InputAnalogActionHandle) {
+func (s steamInput) StopAnalogActionMomentum(inputHandle InputHandle_t, action InputAnalogActionHandle) {
 	iSteamInput_StopAnalogActionMomentum(uintptr(s), inputHandle, action)
 }
 
-func (s steamInput) GetMotionData(inputHandle InputHandle) InputMotionData {
+func (s steamInput) GetMotionData(inputHandle InputHandle_t) InputMotionData {
 	return *uintptrToStruct[InputMotionData](iSteamInput_GetMotionData(uintptr(s), inputHandle))
 }
 
-func (s steamInput) TriggerVibration(inputHandle InputHandle, leftSpeed uint16, rightSpeed uint16) {
+func (s steamInput) TriggerVibration(inputHandle InputHandle_t, leftSpeed uint16, rightSpeed uint16) {
 	iSteamInput_TriggerVibration(uintptr(s), inputHandle, leftSpeed, rightSpeed)
 }
 
-func (s steamInput) TriggerVibrationExtended(inputHandle InputHandle, leftSpeed uint16, rightSpeed uint16, leftTriggerSpeed uint16, rightTriggerSpeed uint16) {
+func (s steamInput) TriggerVibrationExtended(inputHandle InputHandle_t, leftSpeed uint16, rightSpeed uint16, leftTriggerSpeed uint16, rightTriggerSpeed uint16) {
 	iSteamInput_TriggerVibrationExtended(uintptr(s), inputHandle, leftSpeed, rightSpeed, leftTriggerSpeed, rightTriggerSpeed)
 }
 
-func (s steamInput) TriggerSimpleHapticEvent(inputHandle InputHandle, hapticLocation EControllerHapticLocation, intensity uint8, gainDB byte, otherIntensity uint8, otherGainDB byte) {
+func (s steamInput) TriggerSimpleHapticEvent(inputHandle InputHandle_t, hapticLocation EControllerHapticLocation, intensity uint8, gainDB byte, otherIntensity uint8, otherGainDB byte) {
 	iSteamInput_TriggerSimpleHapticEvent(uintptr(s), inputHandle, hapticLocation, intensity, gainDB, otherIntensity, otherGainDB)
 }
 
-func (s steamInput) SetLEDColor(inputHandle InputHandle, colorR uint8, colorG uint8, colorB uint8, flags uint) {
+func (s steamInput) SetLEDColor(inputHandle InputHandle_t, colorR uint8, colorG uint8, colorB uint8, flags uint) {
 	iSteamInput_SetLEDColor(uintptr(s), inputHandle, colorR, colorG, colorB, flags)
 }
 
-func (s steamInput) Legacy_TriggerHapticPulse(inputHandle InputHandle, targetPad ESteamControllerPad, durationMicroSec uint16) {
+func (s steamInput) Legacy_TriggerHapticPulse(inputHandle InputHandle_t, targetPad ESteamControllerPad, durationMicroSec uint16) {
 	iSteamInput_Legacy_TriggerHapticPulse(uintptr(s), inputHandle, targetPad, durationMicroSec)
 }
 
-func (s steamInput) Legacy_TriggerRepeatedHapticPulse(inputHandle InputHandle, targetPad ESteamControllerPad, durationMicroSec uint16, offMicroSec uint16, repeat uint16, flags uint) {
+func (s steamInput) Legacy_TriggerRepeatedHapticPulse(inputHandle InputHandle_t, targetPad ESteamControllerPad, durationMicroSec uint16, offMicroSec uint16, repeat uint16, flags uint) {
 	iSteamInput_Legacy_TriggerRepeatedHapticPulse(uintptr(s), inputHandle, targetPad, durationMicroSec, offMicroSec, repeat, flags)
 }
 
-func (s steamInput) ShowBindingPanel(inputHandle InputHandle) bool {
+func (s steamInput) ShowBindingPanel(inputHandle InputHandle_t) bool {
 	return iSteamInput_ShowBindingPanel(uintptr(s), inputHandle)
 }
 
-func (s steamInput) GetInputTypeForHandle(inputHandle InputHandle) ESteamInputType {
+func (s steamInput) GetInputTypeForHandle(inputHandle InputHandle_t) ESteamInputType {
 	return iSteamInput_GetInputTypeForHandle(uintptr(s), inputHandle)
 }
 
-func (s steamInput) GetControllerForGamepadIndex(index int32) InputHandle {
+func (s steamInput) GetControllerForGamepadIndex(index int32) InputHandle_t {
 	return iSteamInput_GetControllerForGamepadIndex(uintptr(s), index)
 }
 
-func (s steamInput) GetGamepadIndexForController(inputHandle InputHandle) int32 {
+func (s steamInput) GetGamepadIndexForController(inputHandle InputHandle_t) int32 {
 	return iSteamInput_GetGamepadIndexForController(uintptr(s), inputHandle)
 }
 
@@ -2391,7 +2391,7 @@ func (s steamInput) GetGlyphForXboxOrigin(origin EXboxOrigin) []byte {
 	return iSteamInput_GetGlyphForXboxOrigin(uintptr(s), origin)
 }
 
-func (s steamInput) GetActionOriginFromXboxOrigin(inputHandle InputHandle, origin EXboxOrigin) EInputActionOrigin {
+func (s steamInput) GetActionOriginFromXboxOrigin(inputHandle InputHandle_t, origin EXboxOrigin) EInputActionOrigin {
 	return iSteamInput_GetActionOriginFromXboxOrigin(uintptr(s), inputHandle, origin)
 }
 
@@ -2399,12 +2399,12 @@ func (s steamInput) TranslateActionOrigin(destinationInputType ESteamInputType, 
 	return iSteamInput_TranslateActionOrigin(uintptr(s), destinationInputType, sourceOrigin)
 }
 
-func (s steamInput) GetDeviceBindingRevision(inputHandle InputHandle) (major int32, minor int32, foundController bool) {
+func (s steamInput) GetDeviceBindingRevision(inputHandle InputHandle_t) (major int32, minor int32, foundController bool) {
 	foundController = iSteamInput_GetDeviceBindingRevision(uintptr(s), inputHandle, &major, &minor)
 	return major, minor, foundController
 }
 
-func (s steamInput) GetRemotePlaySessionID(inputHandle InputHandle) uint32 {
+func (s steamInput) GetRemotePlaySessionID(inputHandle InputHandle_t) uint32 {
 	return iSteamInput_GetRemotePlaySessionID(uintptr(s), inputHandle)
 }
 
@@ -2412,7 +2412,7 @@ func (s steamInput) GetSessionInputConfigurationSettings() uint16 {
 	return iSteamInput_GetSessionInputConfigurationSettings(uintptr(s))
 }
 
-func (s steamInput) SetDualSenseTriggerEffect(inputHandle InputHandle, param *ScePadTriggerEffectParam) {
+func (s steamInput) SetDualSenseTriggerEffect(inputHandle InputHandle_t, param *ScePadTriggerEffectParam) {
 	iSteamInput_SetDualSenseTriggerEffect(uintptr(s), inputHandle, param)
 }
 
@@ -2438,9 +2438,9 @@ type SteamInventoryResult int32
 type ESteamItemFlags int32
 
 const (
-	ESteamItemNoTrade  ESteamItemFlags = 1
-	ESteamItemRemoved  ESteamItemFlags = 256
-	ESteamItemConsumed ESteamItemFlags = 512
+	ESteamItem_NoTrade  ESteamItemFlags = 1
+	ESteamItem_Removed  ESteamItemFlags = 256
+	ESteamItem_Consumed ESteamItemFlags = 512
 )
 
 const (
@@ -2525,7 +2525,7 @@ var (
 
 type steamInventory uintptr
 
-func SteamInventory() steamInventory {
+func SteamInventory() ISteamInventory {
 	return steamInventory(steamInventory_init())
 }
 
@@ -2725,18 +2725,18 @@ const (
 type EChatEntryType int32
 
 const (
-	EChatEntryTypeInvalid          EChatEntryType = 0
-	EChatEntryTypeChatMsg          EChatEntryType = 1
-	EChatEntryTypeTyping           EChatEntryType = 2
-	EChatEntryTypeInviteGame       EChatEntryType = 3
-	EChatEntryTypeEmote            EChatEntryType = 4
-	EChatEntryTypeLeftConversation EChatEntryType = 6
-	EChatEntryTypeEntered          EChatEntryType = 7
-	EChatEntryTypeWasKicked        EChatEntryType = 8
-	EChatEntryTypeWasBanned        EChatEntryType = 9
-	EChatEntryTypeDisconnected     EChatEntryType = 10
-	EChatEntryTypeHistoricalChat   EChatEntryType = 11
-	EChatEntryTypeLinkBlocked      EChatEntryType = 14
+	EChatEntryType_Invalid          EChatEntryType = 0
+	EChatEntryType_ChatMsg          EChatEntryType = 1
+	EChatEntryType_Typing           EChatEntryType = 2
+	EChatEntryType_InviteGame       EChatEntryType = 3
+	EChatEntryType_Emote            EChatEntryType = 4
+	EChatEntryType_LeftConversation EChatEntryType = 6
+	EChatEntryType_Entered          EChatEntryType = 7
+	EChatEntryType_WasKicked        EChatEntryType = 8
+	EChatEntryType_WasBanned        EChatEntryType = 9
+	EChatEntryType_Disconnected     EChatEntryType = 10
+	EChatEntryType_HistoricalChat   EChatEntryType = 11
+	EChatEntryType_LinkBlocked      EChatEntryType = 14
 )
 
 type EMatchMakingServerResponse int32
@@ -2750,41 +2750,41 @@ const (
 type ELobbyType int32
 
 const (
-	ELobbyTypePrivate       ELobbyType = 0
-	ELobbyTypeFriendsOnly   ELobbyType = 1
-	ELobbyTypePublic        ELobbyType = 2
-	ELobbyTypeInvisible     ELobbyType = 3
-	ELobbyTypePrivateUnique ELobbyType = 4
+	ELobbyType_Private       ELobbyType = 0
+	ELobbyType_FriendsOnly   ELobbyType = 1
+	ELobbyType_Public        ELobbyType = 2
+	ELobbyType_Invisible     ELobbyType = 3
+	ELobbyType_PrivateUnique ELobbyType = 4
 )
 
 type ELobbyComparison int32
 
 const (
-	ELobbyComparisonEqualToOrLessThan    ELobbyComparison = -2
-	ELobbyComparisonLessThan             ELobbyComparison = -1
-	ELobbyComparisonEqual                ELobbyComparison = 0
-	ELobbyComparisonGreaterThan          ELobbyComparison = 1
-	ELobbyComparisonEqualToOrGreaterThan ELobbyComparison = 2
-	ELobbyComparisonNotEqual             ELobbyComparison = 3
+	ELobbyComparisonE_EqualToOrLessThan    ELobbyComparison = -2
+	ELobbyComparisonE_LessThan             ELobbyComparison = -1
+	ELobbyComparisonE_Equal                ELobbyComparison = 0
+	ELobbyComparisonE_GreaterThan          ELobbyComparison = 1
+	ELobbyComparisonE_EqualToOrGreaterThan ELobbyComparison = 2
+	ELobbyComparisonE_NotEqual             ELobbyComparison = 3
 )
 
 type ELobbyDistanceFilter int32
 
 const (
-	ELobbyDistanceFilterClose     ELobbyDistanceFilter = 0
-	ELobbyDistanceFilterDefault   ELobbyDistanceFilter = 1
-	ELobbyDistanceFilterFar       ELobbyDistanceFilter = 2
-	ELobbyDistanceFilterWorldwide ELobbyDistanceFilter = 3
+	ELobbyDistanceFilter_Close     ELobbyDistanceFilter = 0
+	ELobbyDistanceFilter_Default   ELobbyDistanceFilter = 1
+	ELobbyDistanceFilter_Far       ELobbyDistanceFilter = 2
+	ELobbyDistanceFilter_Worldwide ELobbyDistanceFilter = 3
 )
 
 type EChatMemberStateChange int32
 
 const (
-	EChatMemberStateChangeEntered      EChatMemberStateChange = 1
-	EChatMemberStateChangeLeft         EChatMemberStateChange = 2
-	EChatMemberStateChangeDisconnected EChatMemberStateChange = 4
-	EChatMemberStateChangeKicked       EChatMemberStateChange = 8
-	EChatMemberStateChangeBanned       EChatMemberStateChange = 16
+	EChatMemberStateChange_Entered      EChatMemberStateChange = 1
+	EChatMemberStateChange_Left         EChatMemberStateChange = 2
+	EChatMemberStateChange_Disconnected EChatMemberStateChange = 4
+	EChatMemberStateChange_Kicked       EChatMemberStateChange = 8
+	EChatMemberStateChange_Banned       EChatMemberStateChange = 16
 )
 
 const (
@@ -2832,9 +2832,9 @@ const (
 var (
 	steamMatchmaking_init                                        func() uintptr
 	iSteamMatchmaking_GetFavoriteGameCount                       func(steamMatchmaking uintptr) int32
-	iSteamMatchmaking_GetFavoriteGame                            func(steamMatchmaking uintptr, iGame int32, pnAppID *AppId, pnIP *uint32, pnConnPort *uint16, pnQueryPort *uint16, punFlags *uint32, pRTime32LastPlayedOnServer *uint32) bool
-	iSteamMatchmaking_AddFavoriteGame                            func(steamMatchmaking uintptr, nAppID AppId, nIP uint32, nConnPort uint16, nQueryPort uint16, unFlags uint32, rTime32LastPlayedOnServer uint32) int32
-	iSteamMatchmaking_RemoveFavoriteGame                         func(steamMatchmaking uintptr, nAppID AppId, nIP uint32, nConnPort uint16, nQueryPort uint16, unFlags uint32) bool
+	iSteamMatchmaking_GetFavoriteGame                            func(steamMatchmaking uintptr, iGame int32, pnAppID *AppId_t, pnIP *uint32, pnConnPort *uint16, pnQueryPort *uint16, punFlags *uint32, pRTime32LastPlayedOnServer *uint32) bool
+	iSteamMatchmaking_AddFavoriteGame                            func(steamMatchmaking uintptr, nAppID AppId_t, nIP uint32, nConnPort uint16, nQueryPort uint16, unFlags uint32, rTime32LastPlayedOnServer uint32) int32
+	iSteamMatchmaking_RemoveFavoriteGame                         func(steamMatchmaking uintptr, nAppID AppId_t, nIP uint32, nConnPort uint16, nQueryPort uint16, unFlags uint32) bool
 	iSteamMatchmaking_RequestLobbyList                           func(steamMatchmaking uintptr) SteamAPICall
 	iSteamMatchmaking_AddRequestLobbyListStringFilter            func(steamMatchmaking uintptr, pchKeyToMatch string, pchValueToMatch string, eComparisonType ELobbyComparison)
 	iSteamMatchmaking_AddRequestLobbyListNumericalFilter         func(steamMatchmaking uintptr, pchKeyToMatch string, nValueToMatch int32, eComparisonType ELobbyComparison)
@@ -2873,7 +2873,7 @@ var (
 
 type steamMatchmaking uintptr
 
-func SteamMatchmaking() steamMatchmaking {
+func SteamMatchmaking() ISteamMatchmaking {
 	return steamMatchmaking(steamMatchmaking_init())
 }
 
@@ -2881,16 +2881,16 @@ func (s steamMatchmaking) GetFavoriteGameCount() int32 {
 	return iSteamMatchmaking_GetFavoriteGameCount(uintptr(s))
 }
 
-func (s steamMatchmaking) GetFavoriteGame(gameIndex int32) (appID AppId, IP uint32, connPort uint16, queryPort uint16, flags uint32, lastPlayedOnServerTime uint32, success bool) {
+func (s steamMatchmaking) GetFavoriteGame(gameIndex int32) (appID AppId_t, IP uint32, connPort uint16, queryPort uint16, flags uint32, lastPlayedOnServerTime uint32, success bool) {
 	success = iSteamMatchmaking_GetFavoriteGame(uintptr(s), gameIndex, &appID, &IP, &connPort, &queryPort, &flags, &lastPlayedOnServerTime)
 	return appID, IP, connPort, queryPort, flags, lastPlayedOnServerTime, success
 }
 
-func (s steamMatchmaking) AddFavoriteGame(appID AppId, IP uint32, connPort uint16, queryPort uint16, flags uint32, lastPlayedOnServerTime uint32) int32 {
+func (s steamMatchmaking) AddFavoriteGame(appID AppId_t, IP uint32, connPort uint16, queryPort uint16, flags uint32, lastPlayedOnServerTime uint32) int32 {
 	return iSteamMatchmaking_AddFavoriteGame(uintptr(s), appID, IP, connPort, queryPort, flags, lastPlayedOnServerTime)
 }
 
-func (s steamMatchmaking) RemoveFavoriteGame(appID AppId, IP uint32, connPort uint16, queryPort uint16, flags uint32) bool {
+func (s steamMatchmaking) RemoveFavoriteGame(appID AppId_t, IP uint32, connPort uint16, queryPort uint16, flags uint32) bool {
 	return iSteamMatchmaking_RemoveFavoriteGame(uintptr(s), appID, IP, connPort, queryPort, flags)
 }
 
@@ -3215,12 +3215,12 @@ const (
 
 var (
 	steamMatchmakingServers_init                              func() uintptr
-	iSteamMatchmakingServers_RequestInternetServerList        func(steamMatchmakingServers uintptr, iApp AppId, ppchFilters *[]MatchMakingKeyValuePair, nFilters uint32, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
-	iSteamMatchmakingServers_RequestLANServerList             func(steamMatchmakingServers uintptr, iApp AppId, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
-	iSteamMatchmakingServers_RequestFriendsServerList         func(steamMatchmakingServers uintptr, iApp AppId, ppchFilters *[]MatchMakingKeyValuePair, nFilters uint32, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
-	iSteamMatchmakingServers_RequestFavoritesServerList       func(steamMatchmakingServers uintptr, iApp AppId, ppchFilters *[]MatchMakingKeyValuePair, nFilters uint32, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
-	iSteamMatchmakingServers_RequestHistoryServerList         func(steamMatchmakingServers uintptr, iApp AppId, ppchFilters *[]MatchMakingKeyValuePair, nFilters uint32, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
-	iSteamMatchmakingServers_RequestSpectatorServerList       func(steamMatchmakingServers uintptr, iApp AppId, ppchFilters *[]MatchMakingKeyValuePair, nFilters uint32, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
+	iSteamMatchmakingServers_RequestInternetServerList        func(steamMatchmakingServers uintptr, iApp AppId_t, ppchFilters *[]MatchMakingKeyValuePair, nFilters uint32, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
+	iSteamMatchmakingServers_RequestLANServerList             func(steamMatchmakingServers uintptr, iApp AppId_t, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
+	iSteamMatchmakingServers_RequestFriendsServerList         func(steamMatchmakingServers uintptr, iApp AppId_t, ppchFilters *[]MatchMakingKeyValuePair, nFilters uint32, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
+	iSteamMatchmakingServers_RequestFavoritesServerList       func(steamMatchmakingServers uintptr, iApp AppId_t, ppchFilters *[]MatchMakingKeyValuePair, nFilters uint32, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
+	iSteamMatchmakingServers_RequestHistoryServerList         func(steamMatchmakingServers uintptr, iApp AppId_t, ppchFilters *[]MatchMakingKeyValuePair, nFilters uint32, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
+	iSteamMatchmakingServers_RequestSpectatorServerList       func(steamMatchmakingServers uintptr, iApp AppId_t, ppchFilters *[]MatchMakingKeyValuePair, nFilters uint32, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
 	iSteamMatchmakingServers_ReleaseRequest                   func(steamMatchmakingServers uintptr, hServerListRequest HServerListRequest)
 	iSteamMatchmakingServers_GetServerDetails                 func(steamMatchmakingServers uintptr, hRequest HServerListRequest, iServer int32) *GameServerItem
 	iSteamMatchmakingServers_CancelQuery                      func(steamMatchmakingServers uintptr, hRequest HServerListRequest)
@@ -3247,40 +3247,40 @@ var (
 
 type steamMatchmakingServers uintptr
 
-func SteamMatchmakingServers() steamMatchmakingServers {
+func SteamMatchmakingServers() ISteamMatchmakingServers {
 	return steamMatchmakingServers(steamMatchmakingServers_init())
 }
 
-func (s steamMatchmakingServers) RequestInternetServerList(App AppId, FilterCount uint32) (Filters []MatchMakingKeyValuePair, RequestServersResponse MatchmakingServerListResponse, request HServerListRequest) {
+func (s steamMatchmakingServers) RequestInternetServerList(App AppId_t, FilterCount uint32) (Filters []MatchMakingKeyValuePair, RequestServersResponse MatchmakingServerListResponse, request HServerListRequest) {
 	Filters = make([]MatchMakingKeyValuePair, 0, FilterCount)
 	request = iSteamMatchmakingServers_RequestInternetServerList(uintptr(s), App, &Filters, FilterCount, &RequestServersResponse)
 	return Filters, RequestServersResponse, request
 }
 
-func (s steamMatchmakingServers) RequestLANServerList(App AppId) (RequestServersResponse MatchmakingServerListResponse, request HServerListRequest) {
+func (s steamMatchmakingServers) RequestLANServerList(App AppId_t) (RequestServersResponse MatchmakingServerListResponse, request HServerListRequest) {
 	request = iSteamMatchmakingServers_RequestLANServerList(uintptr(s), App, &RequestServersResponse)
 	return RequestServersResponse, request
 }
 
-func (s steamMatchmakingServers) RequestFriendsServerList(App AppId, FilterCount uint32) (Filters []MatchMakingKeyValuePair, RequestServersResponse MatchmakingServerListResponse, request HServerListRequest) {
+func (s steamMatchmakingServers) RequestFriendsServerList(App AppId_t, FilterCount uint32) (Filters []MatchMakingKeyValuePair, RequestServersResponse MatchmakingServerListResponse, request HServerListRequest) {
 	Filters = make([]MatchMakingKeyValuePair, 0, FilterCount)
 	request = iSteamMatchmakingServers_RequestFriendsServerList(uintptr(s), App, &Filters, FilterCount, &RequestServersResponse)
 	return Filters, RequestServersResponse, request
 }
 
-func (s steamMatchmakingServers) RequestFavoritesServerList(App AppId, FilterCount uint32) (Filters []MatchMakingKeyValuePair, RequestServersResponse MatchmakingServerListResponse, request HServerListRequest) {
+func (s steamMatchmakingServers) RequestFavoritesServerList(App AppId_t, FilterCount uint32) (Filters []MatchMakingKeyValuePair, RequestServersResponse MatchmakingServerListResponse, request HServerListRequest) {
 	Filters = make([]MatchMakingKeyValuePair, 0, FilterCount)
 	request = iSteamMatchmakingServers_RequestFavoritesServerList(uintptr(s), App, &Filters, FilterCount, &RequestServersResponse)
 	return Filters, RequestServersResponse, request
 }
 
-func (s steamMatchmakingServers) RequestHistoryServerList(App AppId, FilterCount uint32) (Filters []MatchMakingKeyValuePair, RequestServersResponse MatchmakingServerListResponse, request HServerListRequest) {
+func (s steamMatchmakingServers) RequestHistoryServerList(App AppId_t, FilterCount uint32) (Filters []MatchMakingKeyValuePair, RequestServersResponse MatchmakingServerListResponse, request HServerListRequest) {
 	Filters = make([]MatchMakingKeyValuePair, 0, FilterCount)
 	request = iSteamMatchmakingServers_RequestHistoryServerList(uintptr(s), App, &Filters, FilterCount, &RequestServersResponse)
 	return Filters, RequestServersResponse, request
 }
 
-func (s steamMatchmakingServers) RequestSpectatorServerList(App AppId, FilterCount uint32) (Filters []MatchMakingKeyValuePair, RequestServersResponse MatchmakingServerListResponse, request HServerListRequest) {
+func (s steamMatchmakingServers) RequestSpectatorServerList(App AppId_t, FilterCount uint32) (Filters []MatchMakingKeyValuePair, RequestServersResponse MatchmakingServerListResponse, request HServerListRequest) {
 	Filters = make([]MatchMakingKeyValuePair, 0, FilterCount)
 	request = iSteamMatchmakingServers_RequestSpectatorServerList(uintptr(s), App, &Filters, FilterCount, &RequestServersResponse)
 	return Filters, RequestServersResponse, request
@@ -3404,7 +3404,7 @@ type SteamDatagramHostedAddress struct {
 type SteamDatagramGameCoordinatorServerLogin struct {
 	Identity SteamNetworkingIdentity
 	Routing  SteamDatagramHostedAddress
-	AppID    AppId
+	AppID    AppId_t
 	RTime    RTime32
 	AppData  int32
 	Data     [2048]byte
@@ -3413,16 +3413,16 @@ type SteamDatagramGameCoordinatorServerLogin struct {
 type ESteamNetworkingConnectionState int32
 
 const (
-	ESteamNetworkingConnectionStateNone                   ESteamNetworkingConnectionState = 0
-	ESteamNetworkingConnectionStateConnecting             ESteamNetworkingConnectionState = 1
-	ESteamNetworkingConnectionStateFindingRoute           ESteamNetworkingConnectionState = 2
-	ESteamNetworkingConnectionStateConnected              ESteamNetworkingConnectionState = 3
-	ESteamNetworkingConnectionStateClosedByPeer           ESteamNetworkingConnectionState = 4
-	ESteamNetworkingConnectionStateProblemDetectedLocally ESteamNetworkingConnectionState = 5
-	ESteamNetworkingConnectionStateFinWait                ESteamNetworkingConnectionState = -1
-	ESteamNetworkingConnectionStateLinger                 ESteamNetworkingConnectionState = -2
-	ESteamNetworkingConnectionStateDead                   ESteamNetworkingConnectionState = -3
-	ESteamNetworkingConnectionStateForce32Bit             ESteamNetworkingConnectionState = 2147483647
+	ESteamNetworkingConnectionState_None                   ESteamNetworkingConnectionState = 0
+	ESteamNetworkingConnectionState_Connecting             ESteamNetworkingConnectionState = 1
+	ESteamNetworkingConnectionState_FindingRoute           ESteamNetworkingConnectionState = 2
+	ESteamNetworkingConnectionState_Connected              ESteamNetworkingConnectionState = 3
+	ESteamNetworkingConnectionState_ClosedByPeer           ESteamNetworkingConnectionState = 4
+	ESteamNetworkingConnectionState_ProblemDetectedLocally ESteamNetworkingConnectionState = 5
+	ESteamNetworkingConnectionState_FinWait                ESteamNetworkingConnectionState = -1
+	ESteamNetworkingConnectionState_Linger                 ESteamNetworkingConnectionState = -2
+	ESteamNetworkingConnectionState_Dead                   ESteamNetworkingConnectionState = -3
+	ESteamNetworkingConnectionState_Force32Bit             ESteamNetworkingConnectionState = 2147483647
 )
 
 type SteamNetConnectionInfo struct {
@@ -3489,41 +3489,41 @@ type FnSteamRelayNetworkStatusChanged uintptr
 type ESteamNetworkingAvailability int32
 
 const (
-	ESteamNetworkingAvailabilityCannotTry  ESteamNetworkingAvailability = -102
-	ESteamNetworkingAvailabilityFailed     ESteamNetworkingAvailability = -101
-	ESteamNetworkingAvailabilityPreviously ESteamNetworkingAvailability = -100
-	ESteamNetworkingAvailabilityRetrying   ESteamNetworkingAvailability = -10
-	ESteamNetworkingAvailabilityNeverTried ESteamNetworkingAvailability = 1
-	ESteamNetworkingAvailabilityWaiting    ESteamNetworkingAvailability = 2
-	ESteamNetworkingAvailabilityAttempting ESteamNetworkingAvailability = 3
-	ESteamNetworkingAvailabilityCurrent    ESteamNetworkingAvailability = 100
-	ESteamNetworkingAvailabilityUnknown    ESteamNetworkingAvailability = 0
-	ESteamNetworkingAvailabilityForce32bit ESteamNetworkingAvailability = 2147483647
+	ESteamNetworkingAvailability_CannotTry  ESteamNetworkingAvailability = -102
+	ESteamNetworkingAvailability_Failed     ESteamNetworkingAvailability = -101
+	ESteamNetworkingAvailability_Previously ESteamNetworkingAvailability = -100
+	ESteamNetworkingAvailability_Retrying   ESteamNetworkingAvailability = -10
+	ESteamNetworkingAvailability_NeverTried ESteamNetworkingAvailability = 1
+	ESteamNetworkingAvailability_Waiting    ESteamNetworkingAvailability = 2
+	ESteamNetworkingAvailability_Attempting ESteamNetworkingAvailability = 3
+	ESteamNetworkingAvailability_Current    ESteamNetworkingAvailability = 100
+	ESteamNetworkingAvailability_Unknown    ESteamNetworkingAvailability = 0
+	ESteamNetworkingAvailability_Force32bit ESteamNetworkingAvailability = 2147483647
 )
 
 type ESteamNetworkingSocketsDebugOutputType int32
 
 const (
-	ESteamNetworkingSocketsDebugOutputTypeNone       ESteamNetworkingSocketsDebugOutputType = 0
-	ESteamNetworkingSocketsDebugOutputTypeBug        ESteamNetworkingSocketsDebugOutputType = 1
-	ESteamNetworkingSocketsDebugOutputTypeError      ESteamNetworkingSocketsDebugOutputType = 2
-	ESteamNetworkingSocketsDebugOutputTypeImportant  ESteamNetworkingSocketsDebugOutputType = 3
-	ESteamNetworkingSocketsDebugOutputTypeWarning    ESteamNetworkingSocketsDebugOutputType = 4
-	ESteamNetworkingSocketsDebugOutputTypeMsg        ESteamNetworkingSocketsDebugOutputType = 5
-	ESteamNetworkingSocketsDebugOutputTypeVerbose    ESteamNetworkingSocketsDebugOutputType = 6
-	ESteamNetworkingSocketsDebugOutputTypeDebug      ESteamNetworkingSocketsDebugOutputType = 7
-	ESteamNetworkingSocketsDebugOutputTypeEverything ESteamNetworkingSocketsDebugOutputType = 8
-	ESteamNetworkingSocketsDebugOutputTypeForce32Bit ESteamNetworkingSocketsDebugOutputType = 2147483647
+	ESteamNetworkingSocketsDebugOutputType_None       ESteamNetworkingSocketsDebugOutputType = 0
+	ESteamNetworkingSocketsDebugOutputType_Bug        ESteamNetworkingSocketsDebugOutputType = 1
+	ESteamNetworkingSocketsDebugOutputType_Error      ESteamNetworkingSocketsDebugOutputType = 2
+	ESteamNetworkingSocketsDebugOutputType_Important  ESteamNetworkingSocketsDebugOutputType = 3
+	ESteamNetworkingSocketsDebugOutputType_Warning    ESteamNetworkingSocketsDebugOutputType = 4
+	ESteamNetworkingSocketsDebugOutputType_Msg        ESteamNetworkingSocketsDebugOutputType = 5
+	ESteamNetworkingSocketsDebugOutputType_Verbose    ESteamNetworkingSocketsDebugOutputType = 6
+	ESteamNetworkingSocketsDebugOutputType_Debug      ESteamNetworkingSocketsDebugOutputType = 7
+	ESteamNetworkingSocketsDebugOutputType_Everything ESteamNetworkingSocketsDebugOutputType = 8
+	ESteamNetworkingSocketsDebugOutputType_Force32Bit ESteamNetworkingSocketsDebugOutputType = 2147483647
 )
 
 type ESteamNetworkingFakeIPType int32
 
 const (
-	ESteamNetworkingFakeIPTypeInvalid    ESteamNetworkingFakeIPType = 0
-	ESteamNetworkingFakeIPTypeNotFake    ESteamNetworkingFakeIPType = 1
-	ESteamNetworkingFakeIPTypeGlobalIPv4 ESteamNetworkingFakeIPType = 2
-	ESteamNetworkingFakeIPTypeLocalIPv4  ESteamNetworkingFakeIPType = 3
-	ESteamNetworkingFakeIPTypeForce32Bit ESteamNetworkingFakeIPType = 2147483647
+	ESteamNetworkingFakeIPType_Invalid    ESteamNetworkingFakeIPType = 0
+	ESteamNetworkingFakeIPType_NotFake    ESteamNetworkingFakeIPType = 1
+	ESteamNetworkingFakeIPType_GlobalIPv4 ESteamNetworkingFakeIPType = 2
+	ESteamNetworkingFakeIPType_LocalIPv4  ESteamNetworkingFakeIPType = 3
+	ESteamNetworkingFakeIPType_Force32Bit ESteamNetworkingFakeIPType = 2147483647
 )
 
 type SteamNetworkPingLocation struct {
@@ -3543,15 +3543,15 @@ type SteamNetworkingIPAddr struct {
 type ESteamNetworkingIdentityType int32
 
 const (
-	ESteamNetworkingIdentityTypeInvalid        ESteamNetworkingIdentityType = 0
-	ESteamNetworkingIdentityTypeSteamID        ESteamNetworkingIdentityType = 16
-	ESteamNetworkingIdentityTypeXboxPairwiseID ESteamNetworkingIdentityType = 17
-	ESteamNetworkingIdentityTypeSonyPSN        ESteamNetworkingIdentityType = 18
-	ESteamNetworkingIdentityTypeIPAddress      ESteamNetworkingIdentityType = 1
-	ESteamNetworkingIdentityTypeGenericString  ESteamNetworkingIdentityType = 2
-	ESteamNetworkingIdentityTypeGenericBytes   ESteamNetworkingIdentityType = 3
-	ESteamNetworkingIdentityTypeUnknownType    ESteamNetworkingIdentityType = 4
-	ESteamNetworkingIdentityTypeForce32bit     ESteamNetworkingIdentityType = 2147483647
+	ESteamNetworkingIdentityType_Invalid        ESteamNetworkingIdentityType = 0
+	ESteamNetworkingIdentityType_SteamID        ESteamNetworkingIdentityType = 16
+	ESteamNetworkingIdentityType_XboxPairwiseID ESteamNetworkingIdentityType = 17
+	ESteamNetworkingIdentityType_SonyPSN        ESteamNetworkingIdentityType = 18
+	ESteamNetworkingIdentityType_IPAddress      ESteamNetworkingIdentityType = 1
+	ESteamNetworkingIdentityType_GenericString  ESteamNetworkingIdentityType = 2
+	ESteamNetworkingIdentityType_GenericBytes   ESteamNetworkingIdentityType = 3
+	ESteamNetworkingIdentityType_UnknownType    ESteamNetworkingIdentityType = 4
+	ESteamNetworkingIdentityType_Force32bit     ESteamNetworkingIdentityType = 2147483647
 )
 
 type SteamNetworkingConfigValue struct {
@@ -3568,83 +3568,83 @@ type SteamNetworkingIdentity struct {
 type ESteamNetworkingConfigValue int32
 
 const (
-	ESteamNetworkingConfigInvalid                                       ESteamNetworkingConfigValue = 0
-	ESteamNetworkingConfigTimeoutInitial                                ESteamNetworkingConfigValue = 24
-	ESteamNetworkingConfigTimeoutConnected                              ESteamNetworkingConfigValue = 25
-	ESteamNetworkingConfigSendBufferSize                                ESteamNetworkingConfigValue = 9
-	ESteamNetworkingConfigRecvBufferSize                                ESteamNetworkingConfigValue = 47
-	ESteamNetworkingConfigRecvBufferMessages                            ESteamNetworkingConfigValue = 48
-	ESteamNetworkingConfigRecvMaxMessageSize                            ESteamNetworkingConfigValue = 49
-	ESteamNetworkingConfigRecvMaxSegmentsPerPacket                      ESteamNetworkingConfigValue = 50
-	ESteamNetworkingConfigConnectionUserData                            ESteamNetworkingConfigValue = 40
-	ESteamNetworkingConfigSendRateMin                                   ESteamNetworkingConfigValue = 10
-	ESteamNetworkingConfigSendRateMax                                   ESteamNetworkingConfigValue = 11
-	ESteamNetworkingConfigNagleTime                                     ESteamNetworkingConfigValue = 12
-	ESteamNetworkingConfigIPAllowWithoutAuth                            ESteamNetworkingConfigValue = 23
-	ESteamNetworkingConfigIPLocalHostAllowWithoutAuth                   ESteamNetworkingConfigValue = 52
-	ESteamNetworkingConfigMTUPacketSize                                 ESteamNetworkingConfigValue = 32
-	ESteamNetworkingConfigMTUDataSize                                   ESteamNetworkingConfigValue = 33
-	ESteamNetworkingConfigUnencrypted                                   ESteamNetworkingConfigValue = 34
-	ESteamNetworkingConfigSymmetricConnect                              ESteamNetworkingConfigValue = 37
-	ESteamNetworkingConfigLocalVirtualPort                              ESteamNetworkingConfigValue = 38
-	ESteamNetworkingConfigDualWifiEnable                                ESteamNetworkingConfigValue = 39
-	ESteamNetworkingConfigEnableDiagnosticsUI                           ESteamNetworkingConfigValue = 46
-	ESteamNetworkingConfigSendTimeSincePreviousPacket                   ESteamNetworkingConfigValue = 59
-	ESteamNetworkingConfigFakePacketLossSend                            ESteamNetworkingConfigValue = 2
-	ESteamNetworkingConfigFakePacketLossRecv                            ESteamNetworkingConfigValue = 3
-	ESteamNetworkingConfigFakePacketLagSend                             ESteamNetworkingConfigValue = 4
-	ESteamNetworkingConfigFakePacketLagRecv                             ESteamNetworkingConfigValue = 5
-	ESteamNetworkingConfigFakePacketJitterSendAvg                       ESteamNetworkingConfigValue = 53
-	ESteamNetworkingConfigFakePacketJitterSendMax                       ESteamNetworkingConfigValue = 54
-	ESteamNetworkingConfigFakePacketJitterSendPct                       ESteamNetworkingConfigValue = 55
-	ESteamNetworkingConfigFakePacketJitterRecvAvg                       ESteamNetworkingConfigValue = 56
-	ESteamNetworkingConfigFakePacketJitterRecvMax                       ESteamNetworkingConfigValue = 57
-	ESteamNetworkingConfigFakePacketJitterRecvPct                       ESteamNetworkingConfigValue = 58
-	ESteamNetworkingConfigFakePacketReorderSend                         ESteamNetworkingConfigValue = 6
-	ESteamNetworkingConfigFakePacketReorderRecv                         ESteamNetworkingConfigValue = 7
-	ESteamNetworkingConfigFakePacketReorderTime                         ESteamNetworkingConfigValue = 8
-	ESteamNetworkingConfigFakePacketDupSend                             ESteamNetworkingConfigValue = 26
-	ESteamNetworkingConfigFakePacketDupRecv                             ESteamNetworkingConfigValue = 27
-	ESteamNetworkingConfigFakePacketDupTimeMax                          ESteamNetworkingConfigValue = 28
-	ESteamNetworkingConfigPacketTraceMaxBytes                           ESteamNetworkingConfigValue = 41
-	ESteamNetworkingConfigFakeRateLimitSendRate                         ESteamNetworkingConfigValue = 42
-	ESteamNetworkingConfigFakeRateLimitSendBurst                        ESteamNetworkingConfigValue = 43
-	ESteamNetworkingConfigFakeRateLimitRecvRate                         ESteamNetworkingConfigValue = 44
-	ESteamNetworkingConfigFakeRateLimitRecvBurst                        ESteamNetworkingConfigValue = 45
-	ESteamNetworkingConfigOutOfOrderCorrectionWindowMicroseconds        ESteamNetworkingConfigValue = 51
-	ESteamNetworkingConfigCallbackConnectionStatusChanged               ESteamNetworkingConfigValue = 201
-	ESteamNetworkingConfigCallbackAuthStatusChanged                     ESteamNetworkingConfigValue = 202
-	ESteamNetworkingConfigCallbackRelayNetworkStatusChanged             ESteamNetworkingConfigValue = 203
-	ESteamNetworkingConfigCallbackMessagesSessionRequest                ESteamNetworkingConfigValue = 204
-	ESteamNetworkingConfigCallbackMessagesSessionFailed                 ESteamNetworkingConfigValue = 205
-	ESteamNetworkingConfigCallbackCreateConnectionSignaling             ESteamNetworkingConfigValue = 206
-	ESteamNetworkingConfigCallbackFakeIPResult                          ESteamNetworkingConfigValue = 207
-	ESteamNetworkingConfigP2PSTUNServerList                             ESteamNetworkingConfigValue = 103
-	ESteamNetworkingConfigP2PTransportICEEnable                         ESteamNetworkingConfigValue = 104
-	ESteamNetworkingConfigP2PTransportICEPenalty                        ESteamNetworkingConfigValue = 105
-	ESteamNetworkingConfigP2PTransportSDRPenalty                        ESteamNetworkingConfigValue = 106
-	ESteamNetworkingConfigP2PTURNServerList                             ESteamNetworkingConfigValue = 107
-	ESteamNetworkingConfigP2PTURNUserList                               ESteamNetworkingConfigValue = 108
-	ESteamNetworkingConfigP2PTURNPassList                               ESteamNetworkingConfigValue = 109
-	ESteamNetworkingConfigP2PTransportICEImplementation                 ESteamNetworkingConfigValue = 110
-	ESteamNetworkingConfigSDRClientConsecutitivePingTimeoutsFailInitial ESteamNetworkingConfigValue = 19
-	ESteamNetworkingConfigSDRClientConsecutitivePingTimeoutsFail        ESteamNetworkingConfigValue = 20
-	ESteamNetworkingConfigSDRClientMinPingsBeforePingAccurate           ESteamNetworkingConfigValue = 21
-	ESteamNetworkingConfigSDRClientSingleSocket                         ESteamNetworkingConfigValue = 22
-	ESteamNetworkingConfigSDRClientForceRelayCluster                    ESteamNetworkingConfigValue = 29
-	ESteamNetworkingConfigSDRClientDevTicket                            ESteamNetworkingConfigValue = 30
-	ESteamNetworkingConfigSDRClientForceProxyAddr                       ESteamNetworkingConfigValue = 31
-	ESteamNetworkingConfigSDRClientFakeClusterPing                      ESteamNetworkingConfigValue = 36
-	ESteamNetworkingConfigSDRClientLimitPingProbesToNearestN            ESteamNetworkingConfigValue = 60
-	ESteamNetworkingConfigLogLevelAckRTT                                ESteamNetworkingConfigValue = 13
-	ESteamNetworkingConfigLogLevelPacketDecode                          ESteamNetworkingConfigValue = 14
-	ESteamNetworkingConfigLogLevelMessage                               ESteamNetworkingConfigValue = 15
-	ESteamNetworkingConfigLogLevelPacketGaps                            ESteamNetworkingConfigValue = 16
-	ESteamNetworkingConfigLogLevelP2PRendezvous                         ESteamNetworkingConfigValue = 17
-	ESteamNetworkingConfigLogLevelSDRRelayPings                         ESteamNetworkingConfigValue = 18
-	ESteamNetworkingConfigECN                                           ESteamNetworkingConfigValue = 999
-	ESteamNetworkingConfigDELETEDEnumerateDevVars                       ESteamNetworkingConfigValue = 35
-	ESteamNetworkingConfigValueForce32Bit                               ESteamNetworkingConfigValue = 2147483647
+	ESteamNetworkingConfig_Invalid                                       ESteamNetworkingConfigValue = 0
+	ESteamNetworkingConfig_TimeoutInitial                                ESteamNetworkingConfigValue = 24
+	ESteamNetworkingConfig_TimeoutConnected                              ESteamNetworkingConfigValue = 25
+	ESteamNetworkingConfig_SendBufferSize                                ESteamNetworkingConfigValue = 9
+	ESteamNetworkingConfig_RecvBufferSize                                ESteamNetworkingConfigValue = 47
+	ESteamNetworkingConfig_RecvBufferMessages                            ESteamNetworkingConfigValue = 48
+	ESteamNetworkingConfig_RecvMaxMessageSize                            ESteamNetworkingConfigValue = 49
+	ESteamNetworkingConfig_RecvMaxSegmentsPerPacket                      ESteamNetworkingConfigValue = 50
+	ESteamNetworkingConfig_ConnectionUserData                            ESteamNetworkingConfigValue = 40
+	ESteamNetworkingConfig_SendRateMin                                   ESteamNetworkingConfigValue = 10
+	ESteamNetworkingConfig_SendRateMax                                   ESteamNetworkingConfigValue = 11
+	ESteamNetworkingConfig_NagleTime                                     ESteamNetworkingConfigValue = 12
+	ESteamNetworkingConfig_IPAllowWithoutAuth                            ESteamNetworkingConfigValue = 23
+	ESteamNetworkingConfig_IPLocalHostAllowWithoutAuth                   ESteamNetworkingConfigValue = 52
+	ESteamNetworkingConfig_MTUPacketSize                                 ESteamNetworkingConfigValue = 32
+	ESteamNetworkingConfig_MTUDataSize                                   ESteamNetworkingConfigValue = 33
+	ESteamNetworkingConfig_Unencrypted                                   ESteamNetworkingConfigValue = 34
+	ESteamNetworkingConfig_SymmetricConnect                              ESteamNetworkingConfigValue = 37
+	ESteamNetworkingConfig_LocalVirtualPort                              ESteamNetworkingConfigValue = 38
+	ESteamNetworkingConfig_DualWifiEnable                                ESteamNetworkingConfigValue = 39
+	ESteamNetworkingConfig_EnableDiagnosticsUI                           ESteamNetworkingConfigValue = 46
+	ESteamNetworkingConfig_SendTimeSincePreviousPacket                   ESteamNetworkingConfigValue = 59
+	ESteamNetworkingConfig_FakePacketLossSend                            ESteamNetworkingConfigValue = 2
+	ESteamNetworkingConfig_FakePacketLossRecv                            ESteamNetworkingConfigValue = 3
+	ESteamNetworkingConfig_FakePacketLagSend                             ESteamNetworkingConfigValue = 4
+	ESteamNetworkingConfig_FakePacketLagRecv                             ESteamNetworkingConfigValue = 5
+	ESteamNetworkingConfig_FakePacketJitterSendAvg                       ESteamNetworkingConfigValue = 53
+	ESteamNetworkingConfig_FakePacketJitterSendMax                       ESteamNetworkingConfigValue = 54
+	ESteamNetworkingConfig_FakePacketJitterSendPct                       ESteamNetworkingConfigValue = 55
+	ESteamNetworkingConfig_FakePacketJitterRecvAvg                       ESteamNetworkingConfigValue = 56
+	ESteamNetworkingConfig_FakePacketJitterRecvMax                       ESteamNetworkingConfigValue = 57
+	ESteamNetworkingConfig_FakePacketJitterRecvPct                       ESteamNetworkingConfigValue = 58
+	ESteamNetworkingConfig_FakePacketReorderSend                         ESteamNetworkingConfigValue = 6
+	ESteamNetworkingConfig_FakePacketReorderRecv                         ESteamNetworkingConfigValue = 7
+	ESteamNetworkingConfig_FakePacketReorderTime                         ESteamNetworkingConfigValue = 8
+	ESteamNetworkingConfig_FakePacketDupSend                             ESteamNetworkingConfigValue = 26
+	ESteamNetworkingConfig_FakePacketDupRecv                             ESteamNetworkingConfigValue = 27
+	ESteamNetworkingConfig_FakePacketDupTimeMax                          ESteamNetworkingConfigValue = 28
+	ESteamNetworkingConfig_PacketTraceMaxBytes                           ESteamNetworkingConfigValue = 41
+	ESteamNetworkingConfig_FakeRateLimitSendRate                         ESteamNetworkingConfigValue = 42
+	ESteamNetworkingConfig_FakeRateLimitSendBurst                        ESteamNetworkingConfigValue = 43
+	ESteamNetworkingConfig_FakeRateLimitRecvRate                         ESteamNetworkingConfigValue = 44
+	ESteamNetworkingConfig_FakeRateLimitRecvBurst                        ESteamNetworkingConfigValue = 45
+	ESteamNetworkingConfig_OutOfOrderCorrectionWindowMicroseconds        ESteamNetworkingConfigValue = 51
+	ESteamNetworkingConfig_CallbackConnectionStatusChanged               ESteamNetworkingConfigValue = 201
+	ESteamNetworkingConfig_CallbackAuthStatusChanged                     ESteamNetworkingConfigValue = 202
+	ESteamNetworkingConfig_CallbackRelayNetworkStatusChanged             ESteamNetworkingConfigValue = 203
+	ESteamNetworkingConfig_CallbackMessagesSessionRequest                ESteamNetworkingConfigValue = 204
+	ESteamNetworkingConfig_CallbackMessagesSessionFailed                 ESteamNetworkingConfigValue = 205
+	ESteamNetworkingConfig_CallbackCreateConnectionSignaling             ESteamNetworkingConfigValue = 206
+	ESteamNetworkingConfig_CallbackFakeIPResult                          ESteamNetworkingConfigValue = 207
+	ESteamNetworkingConfig_P2PSTUNServerList                             ESteamNetworkingConfigValue = 103
+	ESteamNetworkingConfig_P2PTransportICEEnable                         ESteamNetworkingConfigValue = 104
+	ESteamNetworkingConfig_P2PTransportICEPenalty                        ESteamNetworkingConfigValue = 105
+	ESteamNetworkingConfig_P2PTransportSDRPenalty                        ESteamNetworkingConfigValue = 106
+	ESteamNetworkingConfig_P2PTURNServerList                             ESteamNetworkingConfigValue = 107
+	ESteamNetworkingConfig_P2PTURNUserList                               ESteamNetworkingConfigValue = 108
+	ESteamNetworkingConfig_P2PTURNPassList                               ESteamNetworkingConfigValue = 109
+	ESteamNetworkingConfig_P2PTransportICEImplementation                 ESteamNetworkingConfigValue = 110
+	ESteamNetworkingConfig_SDRClientConsecutitivePingTimeoutsFailInitial ESteamNetworkingConfigValue = 19
+	ESteamNetworkingConfig_SDRClientConsecutitivePingTimeoutsFail        ESteamNetworkingConfigValue = 20
+	ESteamNetworkingConfig_SDRClientMinPingsBeforePingAccurate           ESteamNetworkingConfigValue = 21
+	ESteamNetworkingConfig_SDRClientSingleSocket                         ESteamNetworkingConfigValue = 22
+	ESteamNetworkingConfig_SDRClientForceRelayCluster                    ESteamNetworkingConfigValue = 29
+	ESteamNetworkingConfig_SDRClientDevTicket                            ESteamNetworkingConfigValue = 30
+	ESteamNetworkingConfig_SDRClientForceProxyAddr                       ESteamNetworkingConfigValue = 31
+	ESteamNetworkingConfig_SDRClientFakeClusterPing                      ESteamNetworkingConfigValue = 36
+	ESteamNetworkingConfig_SDRClientLimitPingProbesToNearestN            ESteamNetworkingConfigValue = 60
+	ESteamNetworkingConfig_LogLevelAckRTT                                ESteamNetworkingConfigValue = 13
+	ESteamNetworkingConfig_LogLevelPacketDecode                          ESteamNetworkingConfigValue = 14
+	ESteamNetworkingConfig_LogLevelMessage                               ESteamNetworkingConfigValue = 15
+	ESteamNetworkingConfig_LogLevelPacketGaps                            ESteamNetworkingConfigValue = 16
+	ESteamNetworkingConfig_LogLevelP2PRendezvous                         ESteamNetworkingConfigValue = 17
+	ESteamNetworkingConfig_LogLevelSDRRelayPings                         ESteamNetworkingConfigValue = 18
+	ESteamNetworkingConfig_ECN                                           ESteamNetworkingConfigValue = 999
+	ESteamNetworkingConfig_DELETEDEnumerateDevVars                       ESteamNetworkingConfigValue = 35
+	ESteamNetworkingConfig_ValueForce32Bit                               ESteamNetworkingConfigValue = 2147483647
 )
 
 type FnSteamNetConnectionStatusChanged uintptr
@@ -3656,71 +3656,71 @@ type FnSteamNetworkingFakeIPResult uintptr
 type ESteamNetworkingConfigScope int32
 
 const (
-	ESteamNetworkingConfigGlobal           ESteamNetworkingConfigScope = 1
-	ESteamNetworkingConfigSocketsInterface ESteamNetworkingConfigScope = 2
-	ESteamNetworkingConfigListenSocket     ESteamNetworkingConfigScope = 3
-	ESteamNetworkingConfigConnection       ESteamNetworkingConfigScope = 4
-	ESteamNetworkingConfigScopeForce32Bit  ESteamNetworkingConfigScope = 2147483647
+	ESteamNetworkingConfig_Global           ESteamNetworkingConfigScope = 1
+	ESteamNetworkingConfig_SocketsInterface ESteamNetworkingConfigScope = 2
+	ESteamNetworkingConfig_ListenSocket     ESteamNetworkingConfigScope = 3
+	ESteamNetworkingConfig_Connection       ESteamNetworkingConfigScope = 4
+	ESteamNetworkingConfig_ScopeForce32Bit  ESteamNetworkingConfigScope = 2147483647
 )
 
 type ESteamNetworkingConfigDataType int32
 
 const (
-	ESteamNetworkingConfigInt32              ESteamNetworkingConfigDataType = 1
-	ESteamNetworkingConfigInt64              ESteamNetworkingConfigDataType = 2
-	ESteamNetworkingConfigFloat              ESteamNetworkingConfigDataType = 3
-	ESteamNetworkingConfigString             ESteamNetworkingConfigDataType = 4
-	ESteamNetworkingConfigPtr                ESteamNetworkingConfigDataType = 5
-	ESteamNetworkingConfigDataTypeForce32Bit ESteamNetworkingConfigDataType = 2147483647
+	ESteamNetworkingConfig_Int32              ESteamNetworkingConfigDataType = 1
+	ESteamNetworkingConfig_Int64              ESteamNetworkingConfigDataType = 2
+	ESteamNetworkingConfig_Float              ESteamNetworkingConfigDataType = 3
+	ESteamNetworkingConfig_String             ESteamNetworkingConfigDataType = 4
+	ESteamNetworkingConfig_Ptr                ESteamNetworkingConfigDataType = 5
+	ESteamNetworkingConfig_DataTypeForce32Bit ESteamNetworkingConfigDataType = 2147483647
 )
 
 type ESteamNetworkingGetConfigValueResult int32
 
 const (
-	ESteamNetworkingGetConfigValueBadValue         ESteamNetworkingGetConfigValueResult = -1
-	ESteamNetworkingGetConfigValueBadScopeObj      ESteamNetworkingGetConfigValueResult = -2
-	ESteamNetworkingGetConfigValueBufferTooSmall   ESteamNetworkingGetConfigValueResult = -3
-	ESteamNetworkingGetConfigValueOK               ESteamNetworkingGetConfigValueResult = 1
-	ESteamNetworkingGetConfigValueOKInherited      ESteamNetworkingGetConfigValueResult = 2
-	ESteamNetworkingGetConfigValueResultForce32Bit ESteamNetworkingGetConfigValueResult = 2147483647
+	ESteamNetworkingGetConfigValue_BadValue         ESteamNetworkingGetConfigValueResult = -1
+	ESteamNetworkingGetConfigValue_BadScopeObj      ESteamNetworkingGetConfigValueResult = -2
+	ESteamNetworkingGetConfigValue_BufferTooSmall   ESteamNetworkingGetConfigValueResult = -3
+	ESteamNetworkingGetConfigValue_OK               ESteamNetworkingGetConfigValueResult = 1
+	ESteamNetworkingGetConfigValue_OKInherited      ESteamNetworkingGetConfigValueResult = 2
+	ESteamNetworkingGetConfigValue_ResultForce32Bit ESteamNetworkingGetConfigValueResult = 2147483647
 )
 
 type ESteamNetConnectionEnd int32
 
 const (
-	ESteamNetConnectionEndInvalid                       ESteamNetConnectionEnd = 0
-	ESteamNetConnectionEndAppMin                        ESteamNetConnectionEnd = 1000
-	ESteamNetConnectionEndAppGeneric                    ESteamNetConnectionEnd = 1000
-	ESteamNetConnectionEndAppMax                        ESteamNetConnectionEnd = 1999
-	ESteamNetConnectionEndAppExceptionMin               ESteamNetConnectionEnd = 2000
-	ESteamNetConnectionEndAppExceptionGeneric           ESteamNetConnectionEnd = 2000
-	ESteamNetConnectionEndAppExceptionMax               ESteamNetConnectionEnd = 2999
-	ESteamNetConnectionEndLocalMin                      ESteamNetConnectionEnd = 3000
-	ESteamNetConnectionEndLocalOfflineMode              ESteamNetConnectionEnd = 3001
-	ESteamNetConnectionEndLocalManyRelayConnectivity    ESteamNetConnectionEnd = 3002
-	ESteamNetConnectionEndLocalHostedServerPrimaryRelay ESteamNetConnectionEnd = 3003
-	ESteamNetConnectionEndLocalNetworkConfig            ESteamNetConnectionEnd = 3004
-	ESteamNetConnectionEndLocalRights                   ESteamNetConnectionEnd = 3005
-	ESteamNetConnectionEndLocalP2PICENoPublicAddresses  ESteamNetConnectionEnd = 3006
-	ESteamNetConnectionEndLocalMax                      ESteamNetConnectionEnd = 3999
-	ESteamNetConnectionEndRemoteMin                     ESteamNetConnectionEnd = 4000
-	ESteamNetConnectionEndRemoteTimeout                 ESteamNetConnectionEnd = 4001
-	ESteamNetConnectionEndRemoteBadCrypt                ESteamNetConnectionEnd = 4002
-	ESteamNetConnectionEndRemoteBadCert                 ESteamNetConnectionEnd = 4003
-	ESteamNetConnectionEndRemoteBadProtocolVersion      ESteamNetConnectionEnd = 4006
-	ESteamNetConnectionEndRemoteP2PICENoPublicAddresses ESteamNetConnectionEnd = 4007
-	ESteamNetConnectionEndRemoteMax                     ESteamNetConnectionEnd = 4999
-	ESteamNetConnectionEndMiscMin                       ESteamNetConnectionEnd = 5000
-	ESteamNetConnectionEndMiscGeneric                   ESteamNetConnectionEnd = 5001
-	ESteamNetConnectionEndMiscInternalError             ESteamNetConnectionEnd = 5002
-	ESteamNetConnectionEndMiscTimeout                   ESteamNetConnectionEnd = 5003
-	ESteamNetConnectionEndMiscSteamConnectivity         ESteamNetConnectionEnd = 5005
-	ESteamNetConnectionEndMiscNoRelaySessionsToClient   ESteamNetConnectionEnd = 5006
-	ESteamNetConnectionEndMiscP2PRendezvous             ESteamNetConnectionEnd = 5008
-	ESteamNetConnectionEndMiscP2PNATFirewall            ESteamNetConnectionEnd = 5009
-	ESteamNetConnectionEndMiscPeerSentNoConnection      ESteamNetConnectionEnd = 5010
-	ESteamNetConnectionEndMiscMax                       ESteamNetConnectionEnd = 5999
-	ESteamNetConnectionEndForce32Bit                    ESteamNetConnectionEnd = 2147483647
+	ESteamNetConnectionEnd_Invalid                       ESteamNetConnectionEnd = 0
+	ESteamNetConnectionEnd_AppMin                        ESteamNetConnectionEnd = 1000
+	ESteamNetConnectionEnd_AppGeneric                    ESteamNetConnectionEnd = 1000
+	ESteamNetConnectionEnd_AppMax                        ESteamNetConnectionEnd = 1999
+	ESteamNetConnectionEnd_AppExceptionMin               ESteamNetConnectionEnd = 2000
+	ESteamNetConnectionEnd_AppExceptionGeneric           ESteamNetConnectionEnd = 2000
+	ESteamNetConnectionEnd_AppExceptionMax               ESteamNetConnectionEnd = 2999
+	ESteamNetConnectionEnd_LocalMin                      ESteamNetConnectionEnd = 3000
+	ESteamNetConnectionEnd_LocalOfflineMode              ESteamNetConnectionEnd = 3001
+	ESteamNetConnectionEnd_LocalManyRelayConnectivity    ESteamNetConnectionEnd = 3002
+	ESteamNetConnectionEnd_LocalHostedServerPrimaryRelay ESteamNetConnectionEnd = 3003
+	ESteamNetConnectionEnd_LocalNetworkConfig            ESteamNetConnectionEnd = 3004
+	ESteamNetConnectionEnd_LocalRights                   ESteamNetConnectionEnd = 3005
+	ESteamNetConnectionEnd_LocalP2PICENoPublicAddresses  ESteamNetConnectionEnd = 3006
+	ESteamNetConnectionEnd_LocalMax                      ESteamNetConnectionEnd = 3999
+	ESteamNetConnectionEnd_RemoteMin                     ESteamNetConnectionEnd = 4000
+	ESteamNetConnectionEnd_RemoteTimeout                 ESteamNetConnectionEnd = 4001
+	ESteamNetConnectionEnd_RemoteBadCrypt                ESteamNetConnectionEnd = 4002
+	ESteamNetConnectionEnd_RemoteBadCert                 ESteamNetConnectionEnd = 4003
+	ESteamNetConnectionEnd_RemoteBadProtocolVersion      ESteamNetConnectionEnd = 4006
+	ESteamNetConnectionEnd_RemoteP2PICENoPublicAddresses ESteamNetConnectionEnd = 4007
+	ESteamNetConnectionEnd_RemoteMax                     ESteamNetConnectionEnd = 4999
+	ESteamNetConnectionEnd_MiscMin                       ESteamNetConnectionEnd = 5000
+	ESteamNetConnectionEnd_MiscGeneric                   ESteamNetConnectionEnd = 5001
+	ESteamNetConnectionEnd_MiscInternalError             ESteamNetConnectionEnd = 5002
+	ESteamNetConnectionEnd_MiscTimeout                   ESteamNetConnectionEnd = 5003
+	ESteamNetConnectionEnd_MiscSteamConnectivity         ESteamNetConnectionEnd = 5005
+	ESteamNetConnectionEnd_MiscNoRelaySessionsToClient   ESteamNetConnectionEnd = 5006
+	ESteamNetConnectionEnd_MiscP2PRendezvous             ESteamNetConnectionEnd = 5008
+	ESteamNetConnectionEnd_MiscP2PNATFirewall            ESteamNetConnectionEnd = 5009
+	ESteamNetConnectionEnd_MiscPeerSentNoConnection      ESteamNetConnectionEnd = 5010
+	ESteamNetConnectionEnd_MiscMax                       ESteamNetConnectionEnd = 5999
+	ESteamNetConnectionEnd_Force32Bit                    ESteamNetConnectionEnd = 2147483647
 )
 
 func (nm SteamNetworkingMessage) GetData() []byte {
@@ -4090,7 +4090,7 @@ var (
 
 type steamNetworkingMessages uintptr
 
-func SteamNetworkingMessages() steamNetworkingMessages {
+func SteamNetworkingMessages() ISteamNetworkingMessages {
 	return steamNetworkingMessages(steamNetworkingMessages_init())
 }
 
@@ -4227,7 +4227,7 @@ const (
 
 type steamNetworkingSockets uintptr
 
-func SteamNetworkingSockets() steamNetworkingSockets {
+func SteamNetworkingSockets() ISteamNetworkingSockets {
 	return steamNetworkingSockets(steamNetworkingSockets_init())
 }
 
@@ -4553,7 +4553,7 @@ const (
 
 type steamNetworkingUtils uintptr
 
-func SteamNetworkingUtils() steamNetworkingUtils {
+func SteamNetworkingUtils() ISteamNetworkingUtils {
 	return steamNetworkingUtils(steamNetworkingUtils_init())
 }
 
@@ -4748,19 +4748,19 @@ const (
 type ESteamPartyBeaconLocationType int32
 
 const (
-	ESteamPartyBeaconLocationTypeInvalid   ESteamPartyBeaconLocationType = 0
-	ESteamPartyBeaconLocationTypeChatGroup ESteamPartyBeaconLocationType = 1
-	ESteamPartyBeaconLocationTypeMax       ESteamPartyBeaconLocationType = 2
+	ESteamPartyBeaconLocationType_Invalid   ESteamPartyBeaconLocationType = 0
+	ESteamPartyBeaconLocationType_ChatGroup ESteamPartyBeaconLocationType = 1
+	ESteamPartyBeaconLocationType_Max       ESteamPartyBeaconLocationType = 2
 )
 
 type ESteamPartyBeaconLocationData int32
 
 const (
-	ESteamPartyBeaconLocationDataInvalid       ESteamPartyBeaconLocationData = 0
-	ESteamPartyBeaconLocationDataName          ESteamPartyBeaconLocationData = 1
-	ESteamPartyBeaconLocationDataIconURLSmall  ESteamPartyBeaconLocationData = 2
-	ESteamPartyBeaconLocationDataIconURLMedium ESteamPartyBeaconLocationData = 3
-	ESteamPartyBeaconLocationDataIconURLLarge  ESteamPartyBeaconLocationData = 4
+	ESteamPartyBeaconLocationData_Invalid       ESteamPartyBeaconLocationData = 0
+	ESteamPartyBeaconLocationData_Name          ESteamPartyBeaconLocationData = 1
+	ESteamPartyBeaconLocationData_IconURLSmall  ESteamPartyBeaconLocationData = 2
+	ESteamPartyBeaconLocationData_IconURLMedium ESteamPartyBeaconLocationData = 3
+	ESteamPartyBeaconLocationData_IconURLLarge  ESteamPartyBeaconLocationData = 4
 )
 
 type PartyBeaconID uint64
@@ -4803,7 +4803,7 @@ var (
 
 type steamParties uintptr
 
-func SteamParties() steamParties {
+func SteamParties() ISteamParties {
 	return steamParties(steamParties_init())
 }
 
@@ -4883,12 +4883,12 @@ type RemotePlaySessionID uint
 type ESteamDeviceFormFactor int32
 
 const (
-	ESteamDeviceFormFactorUnknown   ESteamDeviceFormFactor = 0
-	ESteamDeviceFormFactorPhone     ESteamDeviceFormFactor = 1
-	ESteamDeviceFormFactorTablet    ESteamDeviceFormFactor = 2
-	ESteamDeviceFormFactorComputer  ESteamDeviceFormFactor = 3
-	ESteamDeviceFormFactorTV        ESteamDeviceFormFactor = 4
-	ESteamDeviceFormFactorVRHeadset ESteamDeviceFormFactor = 5
+	ESteamDeviceFormFactor_Unknown   ESteamDeviceFormFactor = 0
+	ESteamDeviceFormFactor_Phone     ESteamDeviceFormFactor = 1
+	ESteamDeviceFormFactor_Tablet    ESteamDeviceFormFactor = 2
+	ESteamDeviceFormFactor_Computer  ESteamDeviceFormFactor = 3
+	ESteamDeviceFormFactor_TV        ESteamDeviceFormFactor = 4
+	ESteamDeviceFormFactor_VRHeadset ESteamDeviceFormFactor = 5
 )
 
 var (
@@ -4905,7 +4905,7 @@ var (
 
 type steamRemotePlay uintptr
 
-func SteamRemotePlay() steamRemotePlay {
+func SteamRemotePlay() ISteamRemotePlay {
 	return steamRemotePlay(steamRemotePlay_init())
 }
 
@@ -4953,34 +4953,34 @@ type SteamParamStringArray struct {
 type ERemoteStoragePublishedFileVisibility int32
 
 const (
-	ERemoteStoragePublishedFileVisibilityPublic      ERemoteStoragePublishedFileVisibility = 0
-	ERemoteStoragePublishedFileVisibilityFriendsOnly ERemoteStoragePublishedFileVisibility = 1
-	ERemoteStoragePublishedFileVisibilityPrivate     ERemoteStoragePublishedFileVisibility = 2
-	ERemoteStoragePublishedFileVisibilityUnlisted    ERemoteStoragePublishedFileVisibility = 3
+	ERemoteStoragePublishedFileVisibility_Public      ERemoteStoragePublishedFileVisibility = 0
+	ERemoteStoragePublishedFileVisibility_FriendsOnly ERemoteStoragePublishedFileVisibility = 1
+	ERemoteStoragePublishedFileVisibility_Private     ERemoteStoragePublishedFileVisibility = 2
+	ERemoteStoragePublishedFileVisibility_Unlisted    ERemoteStoragePublishedFileVisibility = 3
 )
 
 type EWorkshopFileType int32
 
 const (
-	EWorkshopFileTypeFirst                  EWorkshopFileType = 0
-	EWorkshopFileTypeCommunity              EWorkshopFileType = 0
-	EWorkshopFileTypeMicrotransaction       EWorkshopFileType = 1
-	EWorkshopFileTypeCollection             EWorkshopFileType = 2
-	EWorkshopFileTypeArt                    EWorkshopFileType = 3
-	EWorkshopFileTypeVideo                  EWorkshopFileType = 4
-	EWorkshopFileTypeScreenshot             EWorkshopFileType = 5
-	EWorkshopFileTypeGame                   EWorkshopFileType = 6
-	EWorkshopFileTypeSoftware               EWorkshopFileType = 7
-	EWorkshopFileTypeConcept                EWorkshopFileType = 8
-	EWorkshopFileTypeWebGuide               EWorkshopFileType = 9
-	EWorkshopFileTypeIntegratedGuide        EWorkshopFileType = 10
-	EWorkshopFileTypeMerch                  EWorkshopFileType = 11
-	EWorkshopFileTypeControllerBinding      EWorkshopFileType = 12
-	EWorkshopFileTypeSteamworksAccessInvite EWorkshopFileType = 13
-	EWorkshopFileTypeSteamVideo             EWorkshopFileType = 14
-	EWorkshopFileTypeGameManagedItem        EWorkshopFileType = 15
-	EWorkshopFileTypeClip                   EWorkshopFileType = 16
-	EWorkshopFileTypeMax                    EWorkshopFileType = 17
+	EWorkshopFileType_First                  EWorkshopFileType = 0
+	EWorkshopFileType_Community              EWorkshopFileType = 0
+	EWorkshopFileType_Microtransaction       EWorkshopFileType = 1
+	EWorkshopFileType_Collection             EWorkshopFileType = 2
+	EWorkshopFileType_Art                    EWorkshopFileType = 3
+	EWorkshopFileType_Video                  EWorkshopFileType = 4
+	EWorkshopFileType_Screenshot             EWorkshopFileType = 5
+	EWorkshopFileType_Game                   EWorkshopFileType = 6
+	EWorkshopFileType_Software               EWorkshopFileType = 7
+	EWorkshopFileType_Concept                EWorkshopFileType = 8
+	EWorkshopFileType_WebGuide               EWorkshopFileType = 9
+	EWorkshopFileType_IntegratedGuide        EWorkshopFileType = 10
+	EWorkshopFileType_Merch                  EWorkshopFileType = 11
+	EWorkshopFileType_ControllerBinding      EWorkshopFileType = 12
+	EWorkshopFileType_SteamworksAccessInvite EWorkshopFileType = 13
+	EWorkshopFileType_SteamVideo             EWorkshopFileType = 14
+	EWorkshopFileType_GameManagedItem        EWorkshopFileType = 15
+	EWorkshopFileType_Clip                   EWorkshopFileType = 16
+	EWorkshopFileType_Max                    EWorkshopFileType = 17
 )
 
 const (
@@ -5003,74 +5003,74 @@ const (
 type EWorkshopVote int32
 
 const (
-	EWorkshopVoteUnvoted EWorkshopVote = 0
-	EWorkshopVoteFor     EWorkshopVote = 1
-	EWorkshopVoteAgainst EWorkshopVote = 2
-	EWorkshopVoteLater   EWorkshopVote = 3
+	EWorkshopVote_Unvoted EWorkshopVote = 0
+	EWorkshopVote_For     EWorkshopVote = 1
+	EWorkshopVote_Against EWorkshopVote = 2
+	EWorkshopVote_Later   EWorkshopVote = 3
 )
 
 type ERemoteStorageFilePathType int32
 
 const (
-	ERemoteStorageFilePathTypeInvalid     ERemoteStorageFilePathType = 0
-	ERemoteStorageFilePathTypeAbsolute    ERemoteStorageFilePathType = 1
-	ERemoteStorageFilePathTypeAPIFilename ERemoteStorageFilePathType = 2
+	ERemoteStorageFilePathType_Invalid     ERemoteStorageFilePathType = 0
+	ERemoteStorageFilePathType_Absolute    ERemoteStorageFilePathType = 1
+	ERemoteStorageFilePathType_APIFilename ERemoteStorageFilePathType = 2
 )
 
 type EUGCReadAction int32
 
 const (
-	EUGCReadContinueReadingUntilFinished EUGCReadAction = 0
-	EUGCReadContinueReading              EUGCReadAction = 1
-	EUGCReadClose                        EUGCReadAction = 2
+	EUGCRead_ContinueReadingUntilFinished EUGCReadAction = 0
+	EUGCRead_ContinueReading              EUGCReadAction = 1
+	EUGCRead_Close                        EUGCReadAction = 2
 )
 
 type ERemoteStorageLocalFileChange int32
 
 const (
-	ERemoteStorageLocalFileChangeInvalid     ERemoteStorageLocalFileChange = 0
-	ERemoteStorageLocalFileChangeFileUpdated ERemoteStorageLocalFileChange = 1
-	ERemoteStorageLocalFileChangeFileDeleted ERemoteStorageLocalFileChange = 2
+	ERemoteStorageLocalFileChange_Invalid     ERemoteStorageLocalFileChange = 0
+	ERemoteStorageLocalFileChange_FileUpdated ERemoteStorageLocalFileChange = 1
+	ERemoteStorageLocalFileChange_FileDeleted ERemoteStorageLocalFileChange = 2
 )
 
 type EWorkshopVideoProvider int32
 
 const (
-	EWorkshopVideoProviderNone    EWorkshopVideoProvider = 0
-	EWorkshopVideoProviderYoutube EWorkshopVideoProvider = 1
+	EWorkshopVideoProvider_None    EWorkshopVideoProvider = 0
+	EWorkshopVideoProvider_Youtube EWorkshopVideoProvider = 1
 )
 
 type EWorkshopFileAction int32
 
 const (
-	EWorkshopFileActionPlayed    EWorkshopFileAction = 0
-	EWorkshopFileActionCompleted EWorkshopFileAction = 1
+	EWorkshopFileAction_Played    EWorkshopFileAction = 0
+	EWorkshopFileAction_Completed EWorkshopFileAction = 1
 )
 
 type EWorkshopEnumerationType int32
 
 const (
-	EWorkshopEnumerationTypeRankedByVote            EWorkshopEnumerationType = 0
-	EWorkshopEnumerationTypeRecent                  EWorkshopEnumerationType = 1
-	EWorkshopEnumerationTypeTrending                EWorkshopEnumerationType = 2
-	EWorkshopEnumerationTypeFavoritesOfFriends      EWorkshopEnumerationType = 3
-	EWorkshopEnumerationTypeVotedByFriends          EWorkshopEnumerationType = 4
-	EWorkshopEnumerationTypeContentByFriends        EWorkshopEnumerationType = 5
-	EWorkshopEnumerationTypeRecentFromFollowedUsers EWorkshopEnumerationType = 6
+	EWorkshopEnumerationType_RankedByVote            EWorkshopEnumerationType = 0
+	EWorkshopEnumerationType_Recent                  EWorkshopEnumerationType = 1
+	EWorkshopEnumerationType_Trending                EWorkshopEnumerationType = 2
+	EWorkshopEnumerationType_FavoritesOfFriends      EWorkshopEnumerationType = 3
+	EWorkshopEnumerationType_VotedByFriends          EWorkshopEnumerationType = 4
+	EWorkshopEnumerationType_ContentByFriends        EWorkshopEnumerationType = 5
+	EWorkshopEnumerationType_RecentFromFollowedUsers EWorkshopEnumerationType = 6
 )
 
 type ERemoteStoragePlatform int32
 
 const (
-	ERemoteStoragePlatformNone    ERemoteStoragePlatform = 0
-	ERemoteStoragePlatformWindows ERemoteStoragePlatform = 1
-	ERemoteStoragePlatformOSX     ERemoteStoragePlatform = 2
-	ERemoteStoragePlatformPS3     ERemoteStoragePlatform = 4
-	ERemoteStoragePlatformLinux   ERemoteStoragePlatform = 8
-	ERemoteStoragePlatformSwitch  ERemoteStoragePlatform = 16
-	ERemoteStoragePlatformAndroid ERemoteStoragePlatform = 32
-	ERemoteStoragePlatformIOS     ERemoteStoragePlatform = 64
-	ERemoteStoragePlatformAll     ERemoteStoragePlatform = -1
+	ERemoteStoragePlatform_None    ERemoteStoragePlatform = 0
+	ERemoteStoragePlatform_Windows ERemoteStoragePlatform = 1
+	ERemoteStoragePlatform_OSX     ERemoteStoragePlatform = 2
+	ERemoteStoragePlatform_PS3     ERemoteStoragePlatform = 4
+	ERemoteStoragePlatform_Linux   ERemoteStoragePlatform = 8
+	ERemoteStoragePlatform_Switch  ERemoteStoragePlatform = 16
+	ERemoteStoragePlatform_Android ERemoteStoragePlatform = 32
+	ERemoteStoragePlatform_IOS     ERemoteStoragePlatform = 64
+	ERemoteStoragePlatform_All     ERemoteStoragePlatform = -1
 )
 
 type PublishedFileUpdateHandle uint64
@@ -5167,11 +5167,11 @@ var (
 	iSteamRemoteStorage_SetCloudEnabledForApp                   func(steamRemoteStorage uintptr, bEnabled bool)
 	iSteamRemoteStorage_UGCDownload                             func(steamRemoteStorage uintptr, hContent UGCHandle, unPriority uint32) SteamAPICall
 	iSteamRemoteStorage_GetUGCDownloadProgress                  func(steamRemoteStorage uintptr, hContent UGCHandle, pnBytesDownloaded *int32, pnBytesExpected *int32) bool
-	iSteamRemoteStorage_GetUGCDetails                           func(steamRemoteStorage uintptr, hContent UGCHandle, pnAppID *AppId, ppchName *[]byte, pnFileSizeInBytes *int32, pSteamIDOwner *CSteamID) bool
+	iSteamRemoteStorage_GetUGCDetails                           func(steamRemoteStorage uintptr, hContent UGCHandle, pnAppID *AppId_t, ppchName *[]byte, pnFileSizeInBytes *int32, pSteamIDOwner *CSteamID) bool
 	iSteamRemoteStorage_UGCRead                                 func(steamRemoteStorage uintptr, hContent UGCHandle, pvData []byte, cubDataToRead int32, cOffset uint32, eAction EUGCReadAction) int32
 	iSteamRemoteStorage_GetCachedUGCCount                       func(steamRemoteStorage uintptr) int32
 	iSteamRemoteStorage_GetCachedUGCHandle                      func(steamRemoteStorage uintptr, iCachedContent int32) UGCHandle
-	iSteamRemoteStorage_PublishWorkshopFile                     func(steamRemoteStorage uintptr, pchFile string, pchPreviewFile string, nConsumerAppId AppId, pchTitle string, pchDescription string, eVisibility ERemoteStoragePublishedFileVisibility, pTags uintptr, eWorkshopFileType EWorkshopFileType) SteamAPICall
+	iSteamRemoteStorage_PublishWorkshopFile                     func(steamRemoteStorage uintptr, pchFile string, pchPreviewFile string, nConsumerAppId AppId_t, pchTitle string, pchDescription string, eVisibility ERemoteStoragePublishedFileVisibility, pTags uintptr, eWorkshopFileType EWorkshopFileType) SteamAPICall
 	iSteamRemoteStorage_CreatePublishedFileUpdateRequest        func(steamRemoteStorage uintptr, unPublishedFileId PublishedFileId) PublishedFileUpdateHandle
 	iSteamRemoteStorage_UpdatePublishedFileFile                 func(steamRemoteStorage uintptr, updateHandle PublishedFileUpdateHandle, pchFile string) bool
 	iSteamRemoteStorage_UpdatePublishedFilePreviewFile          func(steamRemoteStorage uintptr, updateHandle PublishedFileUpdateHandle, pchPreviewFile string) bool
@@ -5191,7 +5191,7 @@ var (
 	iSteamRemoteStorage_UpdateUserPublishedItemVote             func(steamRemoteStorage uintptr, unPublishedFileId PublishedFileId, bVoteUp bool) SteamAPICall
 	iSteamRemoteStorage_GetUserPublishedItemVoteDetails         func(steamRemoteStorage uintptr, unPublishedFileId PublishedFileId) SteamAPICall
 	iSteamRemoteStorage_EnumerateUserSharedWorkshopFiles        func(steamRemoteStorage uintptr, steamId Uint64SteamID, unStartIndex uint32, pRequiredTags uintptr, pExcludedTags uintptr) SteamAPICall
-	iSteamRemoteStorage_PublishVideo                            func(steamRemoteStorage uintptr, eVideoProvider EWorkshopVideoProvider, pchVideoAccount string, pchVideoIdentifier string, pchPreviewFile string, nConsumerAppId AppId, pchTitle string, pchDescription string, eVisibility ERemoteStoragePublishedFileVisibility, pTags uintptr) SteamAPICall
+	iSteamRemoteStorage_PublishVideo                            func(steamRemoteStorage uintptr, eVideoProvider EWorkshopVideoProvider, pchVideoAccount string, pchVideoIdentifier string, pchPreviewFile string, nConsumerAppId AppId_t, pchTitle string, pchDescription string, eVisibility ERemoteStoragePublishedFileVisibility, pTags uintptr) SteamAPICall
 	iSteamRemoteStorage_SetUserPublishedFileAction              func(steamRemoteStorage uintptr, unPublishedFileId PublishedFileId, eAction EWorkshopFileAction) SteamAPICall
 	iSteamRemoteStorage_EnumeratePublishedFilesByUserAction     func(steamRemoteStorage uintptr, eAction EWorkshopFileAction, unStartIndex uint32) SteamAPICall
 	iSteamRemoteStorage_EnumeratePublishedWorkshopFiles         func(steamRemoteStorage uintptr, eEnumerationType EWorkshopEnumerationType, unStartIndex uint32, unCount uint32, unDays uint32, pTags *SteamParamStringArray, pUserTags *SteamParamStringArray) SteamAPICall
@@ -5204,7 +5204,7 @@ var (
 
 type steamRemoteStorage uintptr
 
-func SteamRemoteStorage() steamRemoteStorage {
+func SteamRemoteStorage() ISteamRemoteStorage {
 	return steamRemoteStorage(steamRemoteStorage_init())
 }
 
@@ -5212,12 +5212,16 @@ func (s steamRemoteStorage) FileWrite(File string, Data []byte) bool {
 	return iSteamRemoteStorage_FileWrite(uintptr(s), File, Data, int32(len(Data)))
 }
 
-func (s steamRemoteStorage) FileRead(File string, DataToReadSize int32) (Data []byte) {
+func (s steamRemoteStorage) FileRead(File string, Data []byte) (bytesRead int32) {
+	result := iSteamRemoteStorage_FileRead(uintptr(s), File, Data, int32(len(Data)))
+	return result
+}
+
+func (s steamRemoteStorage) FileReadEx(File string, DataToReadSize int32) (Data []byte) {
 	Data = make([]byte, 0, DataToReadSize)
 	result := iSteamRemoteStorage_FileRead(uintptr(s), File, Data, DataToReadSize)
 	return Data[:result]
 }
-
 func (s steamRemoteStorage) FileWriteAsync(File string, Data []byte) CallResult[RemoteStorageFileWriteAsyncComplete] {
 	handle := iSteamRemoteStorage_FileWriteAsync(uintptr(s), File, Data, uint32(len(Data)))
 	return CallResult[RemoteStorageFileWriteAsyncComplete]{Handle: handle}
@@ -5323,7 +5327,7 @@ func (s steamRemoteStorage) GetUGCDownloadProgress(Content UGCHandle) (BytesDown
 	return BytesDownloaded, BytesExpected, success
 }
 
-func (s steamRemoteStorage) GetUGCDetails(Content UGCHandle) (AppID AppId, Name string, FileSizeInBytes int32, ownerSteamID CSteamID, success bool) {
+func (s steamRemoteStorage) GetUGCDetails(Content UGCHandle) (AppID AppId_t, Name string, FileSizeInBytes int32, ownerSteamID CSteamID, success bool) {
 	var ppchNameBuf []byte = make([]byte, 0, 4096)
 	success = iSteamRemoteStorage_GetUGCDetails(uintptr(s), Content, &AppID, &ppchNameBuf, &FileSizeInBytes, &ownerSteamID)
 	return AppID, string(ppchNameBuf), FileSizeInBytes, ownerSteamID, success
@@ -5343,7 +5347,7 @@ func (s steamRemoteStorage) GetCachedUGCHandle(CachedContent int32) UGCHandle {
 	return iSteamRemoteStorage_GetCachedUGCHandle(uintptr(s), CachedContent)
 }
 
-func (s steamRemoteStorage) PublishWorkshopFile(File string, PreviewFile string, ConsumerAppId AppId, Title string, Description string, Visibility ERemoteStoragePublishedFileVisibility, Tags SteamParamStringArray, WorkshopFileType EWorkshopFileType) CallResult[RemoteStoragePublishFileProgress] {
+func (s steamRemoteStorage) PublishWorkshopFile(File string, PreviewFile string, ConsumerAppId AppId_t, Title string, Description string, Visibility ERemoteStoragePublishedFileVisibility, Tags SteamParamStringArray, WorkshopFileType EWorkshopFileType) CallResult[RemoteStoragePublishFileProgress] {
 	handle := iSteamRemoteStorage_PublishWorkshopFile(uintptr(s), File, PreviewFile, ConsumerAppId, Title, Description, Visibility, structToUintptr[SteamParamStringArray](&Tags), WorkshopFileType)
 	return CallResult[RemoteStoragePublishFileProgress]{Handle: handle}
 }
@@ -5435,7 +5439,7 @@ func (s steamRemoteStorage) EnumerateUserSharedWorkshopFiles(steamId Uint64Steam
 	return CallResult[RemoteStorageEnumerateUserPublishedFilesResult]{Handle: handle}
 }
 
-func (s steamRemoteStorage) PublishVideo(VideoProvider EWorkshopVideoProvider, VideoAccount string, VideoIdentifier string, PreviewFile string, ConsumerAppId AppId, Title string, Description string, Visibility ERemoteStoragePublishedFileVisibility, Tags SteamParamStringArray) CallResult[RemoteStoragePublishFileProgress] {
+func (s steamRemoteStorage) PublishVideo(VideoProvider EWorkshopVideoProvider, VideoAccount string, VideoIdentifier string, PreviewFile string, ConsumerAppId AppId_t, Title string, Description string, Visibility ERemoteStoragePublishedFileVisibility, Tags SteamParamStringArray) CallResult[RemoteStoragePublishFileProgress] {
 	handle := iSteamRemoteStorage_PublishVideo(uintptr(s), VideoProvider, VideoAccount, VideoIdentifier, PreviewFile, ConsumerAppId, Title, Description, Visibility, structToUintptr[SteamParamStringArray](&Tags))
 	return CallResult[RemoteStoragePublishFileProgress]{Handle: handle}
 }
@@ -5504,12 +5508,12 @@ type ScreenshotHandle uint
 type EVRScreenshotType int32
 
 const (
-	EVRScreenshotTypeNone           EVRScreenshotType = 0
-	EVRScreenshotTypeMono           EVRScreenshotType = 1
-	EVRScreenshotTypeStereo         EVRScreenshotType = 2
-	EVRScreenshotTypeMonoCubemap    EVRScreenshotType = 3
-	EVRScreenshotTypeMonoPanorama   EVRScreenshotType = 4
-	EVRScreenshotTypeStereoPanorama EVRScreenshotType = 5
+	EVRScreenshotType_None           EVRScreenshotType = 0
+	EVRScreenshotType_Mono           EVRScreenshotType = 1
+	EVRScreenshotType_Stereo         EVRScreenshotType = 2
+	EVRScreenshotType_MonoCubemap    EVRScreenshotType = 3
+	EVRScreenshotType_MonoPanorama   EVRScreenshotType = 4
+	EVRScreenshotType_StereoPanorama EVRScreenshotType = 5
 )
 
 var (
@@ -5527,7 +5531,7 @@ var (
 
 type steamScreenshots uintptr
 
-func SteamScreenshots() steamScreenshots {
+func SteamScreenshots() ISteamScreenshots {
 	return steamScreenshots(steamScreenshots_init())
 }
 
@@ -5580,71 +5584,71 @@ type UGCUpdateHandle uint64
 type EUGCContentDescriptorID int32
 
 const (
-	EUGCContentDescriptorNudityOrSexualContent   EUGCContentDescriptorID = 1
-	EUGCContentDescriptorFrequentViolenceOrGore  EUGCContentDescriptorID = 2
-	EUGCContentDescriptorAdultOnlySexualContent  EUGCContentDescriptorID = 3
-	EUGCContentDescriptorGratuitousSexualContent EUGCContentDescriptorID = 4
-	EUGCContentDescriptorAnyMatureContent        EUGCContentDescriptorID = 5
+	EUGCContentDescriptor_NudityOrSexualContent   EUGCContentDescriptorID = 1
+	EUGCContentDescriptor_FrequentViolenceOrGore  EUGCContentDescriptorID = 2
+	EUGCContentDescriptor_AdultOnlySexualContent  EUGCContentDescriptorID = 3
+	EUGCContentDescriptor_GratuitousSexualContent EUGCContentDescriptorID = 4
+	EUGCContentDescriptor_AnyMatureContent        EUGCContentDescriptorID = 5
 )
 
 type EUserUGCList int32
 
 const (
-	EUserUGCListPublished     EUserUGCList = 0
-	EUserUGCListVotedOn       EUserUGCList = 1
-	EUserUGCListVotedUp       EUserUGCList = 2
-	EUserUGCListVotedDown     EUserUGCList = 3
-	EUserUGCListWillVoteLater EUserUGCList = 4
-	EUserUGCListFavorited     EUserUGCList = 5
-	EUserUGCListSubscribed    EUserUGCList = 6
-	EUserUGCListUsedOrPlayed  EUserUGCList = 7
-	EUserUGCListFollowed      EUserUGCList = 8
+	EUserUGCList_Published     EUserUGCList = 0
+	EUserUGCList_VotedOn       EUserUGCList = 1
+	EUserUGCList_VotedUp       EUserUGCList = 2
+	EUserUGCList_VotedDown     EUserUGCList = 3
+	EUserUGCList_WillVoteLater EUserUGCList = 4
+	EUserUGCList_Favorited     EUserUGCList = 5
+	EUserUGCList_Subscribed    EUserUGCList = 6
+	EUserUGCList_UsedOrPlayed  EUserUGCList = 7
+	EUserUGCList_Followed      EUserUGCList = 8
 )
 
 type EUGCQuery int32
 
 const (
-	EUGCQueryRankedByVote                                  EUGCQuery = 0
-	EUGCQueryRankedByPublicationDate                       EUGCQuery = 1
-	EUGCQueryAcceptedForGameRankedByAcceptanceDate         EUGCQuery = 2
-	EUGCQueryRankedByTrend                                 EUGCQuery = 3
-	EUGCQueryFavoritedByFriendsRankedByPublicationDate     EUGCQuery = 4
-	EUGCQueryCreatedByFriendsRankedByPublicationDate       EUGCQuery = 5
-	EUGCQueryRankedByNumTimesReported                      EUGCQuery = 6
-	EUGCQueryCreatedByFollowedUsersRankedByPublicationDate EUGCQuery = 7
-	EUGCQueryNotYetRated                                   EUGCQuery = 8
-	EUGCQueryRankedByTotalVotesAsc                         EUGCQuery = 9
-	EUGCQueryRankedByVotesUp                               EUGCQuery = 10
-	EUGCQueryRankedByTextSearch                            EUGCQuery = 11
-	EUGCQueryRankedByTotalUniqueSubscriptions              EUGCQuery = 12
-	EUGCQueryRankedByPlaytimeTrend                         EUGCQuery = 13
-	EUGCQueryRankedByTotalPlaytime                         EUGCQuery = 14
-	EUGCQueryRankedByAveragePlaytimeTrend                  EUGCQuery = 15
-	EUGCQueryRankedByLifetimeAveragePlaytime               EUGCQuery = 16
-	EUGCQueryRankedByPlaytimeSessionsTrend                 EUGCQuery = 17
-	EUGCQueryRankedByLifetimePlaytimeSessions              EUGCQuery = 18
-	EUGCQueryRankedByLastUpdatedDate                       EUGCQuery = 19
+	EUGCQuery_RankedByVote                                  EUGCQuery = 0
+	EUGCQuery_RankedByPublicationDate                       EUGCQuery = 1
+	EUGCQuery_AcceptedForGameRankedByAcceptanceDate         EUGCQuery = 2
+	EUGCQuery_RankedByTrend                                 EUGCQuery = 3
+	EUGCQuery_FavoritedByFriendsRankedByPublicationDate     EUGCQuery = 4
+	EUGCQuery_CreatedByFriendsRankedByPublicationDate       EUGCQuery = 5
+	EUGCQuery_RankedByNumTimesReported                      EUGCQuery = 6
+	EUGCQuery_CreatedByFollowedUsersRankedByPublicationDate EUGCQuery = 7
+	EUGCQuery_NotYetRated                                   EUGCQuery = 8
+	EUGCQuery_RankedByTotalVotesAsc                         EUGCQuery = 9
+	EUGCQuery_RankedByVotesUp                               EUGCQuery = 10
+	EUGCQuery_RankedByTextSearch                            EUGCQuery = 11
+	EUGCQuery_RankedByTotalUniqueSubscriptions              EUGCQuery = 12
+	EUGCQuery_RankedByPlaytimeTrend                         EUGCQuery = 13
+	EUGCQuery_RankedByTotalPlaytime                         EUGCQuery = 14
+	EUGCQuery_RankedByAveragePlaytimeTrend                  EUGCQuery = 15
+	EUGCQuery_RankedByLifetimeAveragePlaytime               EUGCQuery = 16
+	EUGCQuery_RankedByPlaytimeSessionsTrend                 EUGCQuery = 17
+	EUGCQuery_RankedByLifetimePlaytimeSessions              EUGCQuery = 18
+	EUGCQuery_RankedByLastUpdatedDate                       EUGCQuery = 19
 )
 
 type EItemState int32
 
 const (
-	EItemStateNone            EItemState = 0
-	EItemStateSubscribed      EItemState = 1
-	EItemStateLegacyItem      EItemState = 2
-	EItemStateInstalled       EItemState = 4
-	EItemStateNeedsUpdate     EItemState = 8
-	EItemStateDownloading     EItemState = 16
-	EItemStateDownloadPending EItemState = 32
-	EItemStateDisabledLocally EItemState = 64
+	EItemState_None            EItemState = 0
+	EItemState_Subscribed      EItemState = 1
+	EItemState_LegacyItem      EItemState = 2
+	EItemState_Installed       EItemState = 4
+	EItemState_NeedsUpdate     EItemState = 8
+	EItemState_Downloading     EItemState = 16
+	EItemState_DownloadPending EItemState = 32
+	EItemState_DisabledLocally EItemState = 64
 )
 
 type SteamUGCDetails struct {
 	PublishedFileId     PublishedFileId
 	Result              EResult
 	FileType            EWorkshopFileType
-	CreatorAppID        AppId
-	ConsumerAppID       AppId
+	CreatorAppID        AppId_t
+	ConsumerAppID       AppId_t
 	Title               [129]byte
 	Description         [8000]byte
 	SteamIDOwner        uint64
@@ -5672,73 +5676,73 @@ type SteamUGCDetails struct {
 type EUGCMatchingUGCType int32
 
 const (
-	EUGCMatchingUGCTypeItems              EUGCMatchingUGCType = 0
-	EUGCMatchingUGCTypeItemsMtx           EUGCMatchingUGCType = 1
-	EUGCMatchingUGCTypeItemsReadyToUse    EUGCMatchingUGCType = 2
-	EUGCMatchingUGCTypeCollections        EUGCMatchingUGCType = 3
-	EUGCMatchingUGCTypeArtwork            EUGCMatchingUGCType = 4
-	EUGCMatchingUGCTypeVideos             EUGCMatchingUGCType = 5
-	EUGCMatchingUGCTypeScreenshots        EUGCMatchingUGCType = 6
-	EUGCMatchingUGCTypeAllGuides          EUGCMatchingUGCType = 7
-	EUGCMatchingUGCTypeWebGuides          EUGCMatchingUGCType = 8
-	EUGCMatchingUGCTypeIntegratedGuides   EUGCMatchingUGCType = 9
-	EUGCMatchingUGCTypeUsableInGame       EUGCMatchingUGCType = 10
-	EUGCMatchingUGCTypeControllerBindings EUGCMatchingUGCType = 11
-	EUGCMatchingUGCTypeGameManagedItems   EUGCMatchingUGCType = 12
-	EUGCMatchingUGCTypeAll                EUGCMatchingUGCType = -1
+	EUGCMatchingUGCType_Items              EUGCMatchingUGCType = 0
+	EUGCMatchingUGCType_ItemsMtx           EUGCMatchingUGCType = 1
+	EUGCMatchingUGCType_ItemsReadyToUse    EUGCMatchingUGCType = 2
+	EUGCMatchingUGCType_Collections        EUGCMatchingUGCType = 3
+	EUGCMatchingUGCType_Artwork            EUGCMatchingUGCType = 4
+	EUGCMatchingUGCType_Videos             EUGCMatchingUGCType = 5
+	EUGCMatchingUGCType_Screenshots        EUGCMatchingUGCType = 6
+	EUGCMatchingUGCType_AllGuides          EUGCMatchingUGCType = 7
+	EUGCMatchingUGCType_WebGuides          EUGCMatchingUGCType = 8
+	EUGCMatchingUGCType_IntegratedGuides   EUGCMatchingUGCType = 9
+	EUGCMatchingUGCType_UsableInGame       EUGCMatchingUGCType = 10
+	EUGCMatchingUGCType_ControllerBindings EUGCMatchingUGCType = 11
+	EUGCMatchingUGCType_GameManagedItems   EUGCMatchingUGCType = 12
+	EUGCMatchingUGCType_All                EUGCMatchingUGCType = -1
 )
 
 type EUserUGCListSortOrder int32
 
 const (
-	EUserUGCListSortOrderCreationOrderDesc    EUserUGCListSortOrder = 0
-	EUserUGCListSortOrderCreationOrderAsc     EUserUGCListSortOrder = 1
-	EUserUGCListSortOrderTitleAsc             EUserUGCListSortOrder = 2
-	EUserUGCListSortOrderLastUpdatedDesc      EUserUGCListSortOrder = 3
-	EUserUGCListSortOrderSubscriptionDateDesc EUserUGCListSortOrder = 4
-	EUserUGCListSortOrderVoteScoreDesc        EUserUGCListSortOrder = 5
-	EUserUGCListSortOrderForModeration        EUserUGCListSortOrder = 6
+	EUserUGCList_SortOrder_CreationOrderDesc    EUserUGCListSortOrder = 0
+	EUserUGCList_SortOrder_CreationOrderAsc     EUserUGCListSortOrder = 1
+	EUserUGCList_SortOrder_TitleAsc             EUserUGCListSortOrder = 2
+	EUserUGCList_SortOrder_LastUpdatedDesc      EUserUGCListSortOrder = 3
+	EUserUGCList_SortOrder_SubscriptionDateDesc EUserUGCListSortOrder = 4
+	EUserUGCList_SortOrder_VoteScoreDesc        EUserUGCListSortOrder = 5
+	EUserUGCList_SortOrder_ForModeration        EUserUGCListSortOrder = 6
 )
 
 type EItemPreviewType int32
 
 const (
-	EItemPreviewTypeImage                         EItemPreviewType = 0
-	EItemPreviewTypeYouTubeVideo                  EItemPreviewType = 1
-	EItemPreviewTypeSketchfab                     EItemPreviewType = 2
-	EItemPreviewTypeEnvironmentMapHorizontalCross EItemPreviewType = 3
-	EItemPreviewTypeEnvironmentMapLatLong         EItemPreviewType = 4
-	EItemPreviewTypeClip                          EItemPreviewType = 5
-	EItemPreviewTypeReservedMax                   EItemPreviewType = 255
+	EItemPreviewType_Image                         EItemPreviewType = 0
+	EItemPreviewType_YouTubeVideo                  EItemPreviewType = 1
+	EItemPreviewType_Sketchfab                     EItemPreviewType = 2
+	EItemPreviewType_EnvironmentMapHorizontalCross EItemPreviewType = 3
+	EItemPreviewType_EnvironmentMapLatLong         EItemPreviewType = 4
+	EItemPreviewType_Clip                          EItemPreviewType = 5
+	EItemPreviewType_ReservedMax                   EItemPreviewType = 255
 )
 
 type EItemUpdateStatus int32
 
 const (
-	EItemUpdateStatusInvalid              EItemUpdateStatus = 0
-	EItemUpdateStatusPreparingConfig      EItemUpdateStatus = 1
-	EItemUpdateStatusPreparingContent     EItemUpdateStatus = 2
-	EItemUpdateStatusUploadingContent     EItemUpdateStatus = 3
-	EItemUpdateStatusUploadingPreviewFile EItemUpdateStatus = 4
-	EItemUpdateStatusCommittingChanges    EItemUpdateStatus = 5
+	EItemUpdateStatus_Invalid              EItemUpdateStatus = 0
+	EItemUpdateStatus_PreparingConfig      EItemUpdateStatus = 1
+	EItemUpdateStatus_PreparingContent     EItemUpdateStatus = 2
+	EItemUpdateStatus_UploadingContent     EItemUpdateStatus = 3
+	EItemUpdateStatus_UploadingPreviewFile EItemUpdateStatus = 4
+	EItemUpdateStatus_CommittingChanges    EItemUpdateStatus = 5
 )
 
 type EItemStatistic int32
 
 const (
-	EItemStatisticNumSubscriptions                    EItemStatistic = 0
-	EItemStatisticNumFavorites                        EItemStatistic = 1
-	EItemStatisticNumFollowers                        EItemStatistic = 2
-	EItemStatisticNumUniqueSubscriptions              EItemStatistic = 3
-	EItemStatisticNumUniqueFavorites                  EItemStatistic = 4
-	EItemStatisticNumUniqueFollowers                  EItemStatistic = 5
-	EItemStatisticNumUniqueWebsiteViews               EItemStatistic = 6
-	EItemStatisticReportScore                         EItemStatistic = 7
-	EItemStatisticNumSecondsPlayed                    EItemStatistic = 8
-	EItemStatisticNumPlaytimeSessions                 EItemStatistic = 9
-	EItemStatisticNumComments                         EItemStatistic = 10
-	EItemStatisticNumSecondsPlayedDuringTimePeriod    EItemStatistic = 11
-	EItemStatisticNumPlaytimeSessionsDuringTimePeriod EItemStatistic = 12
+	EItemStatistic_NumSubscriptions                    EItemStatistic = 0
+	EItemStatistic_NumFavorites                        EItemStatistic = 1
+	EItemStatistic_NumFollowers                        EItemStatistic = 2
+	EItemStatistic_NumUniqueSubscriptions              EItemStatistic = 3
+	EItemStatistic_NumUniqueFavorites                  EItemStatistic = 4
+	EItemStatistic_NumUniqueFollowers                  EItemStatistic = 5
+	EItemStatistic_NumUniqueWebsiteViews               EItemStatistic = 6
+	EItemStatistic_ReportScore                         EItemStatistic = 7
+	EItemStatistic_NumSecondsPlayed                    EItemStatistic = 8
+	EItemStatistic_NumPlaytimeSessions                 EItemStatistic = 9
+	EItemStatistic_NumComments                         EItemStatistic = 10
+	EItemStatistic_NumSecondsPlayedDuringTimePeriod    EItemStatistic = 11
+	EItemStatistic_NumPlaytimeSessionsDuringTimePeriod EItemStatistic = 12
 )
 
 const (
@@ -5840,9 +5844,9 @@ const (
 
 var (
 	steamUGC_init                                 func() uintptr
-	iSteamUGC_CreateQueryUserUGCRequest           func(steamUGC uintptr, unAccountID AccountID, eListType EUserUGCList, eMatchingUGCType EUGCMatchingUGCType, eSortOrder EUserUGCListSortOrder, nCreatorAppID AppId, nConsumerAppID AppId, unPage uint32) UGCQueryHandle
-	iSteamUGC_CreateQueryAllUGCRequestPage        func(steamUGC uintptr, eQueryType EUGCQuery, eMatchingeMatchingUGCTypeFileType EUGCMatchingUGCType, nCreatorAppID AppId, nConsumerAppID AppId, unPage uint32) UGCQueryHandle
-	iSteamUGC_CreateQueryAllUGCRequestCursor      func(steamUGC uintptr, eQueryType EUGCQuery, eMatchingeMatchingUGCTypeFileType EUGCMatchingUGCType, nCreatorAppID AppId, nConsumerAppID AppId, pchCursor string) UGCQueryHandle
+	iSteamUGC_CreateQueryUserUGCRequest           func(steamUGC uintptr, unAccountID AccountID, eListType EUserUGCList, eMatchingUGCType EUGCMatchingUGCType, eSortOrder EUserUGCListSortOrder, nCreatorAppID AppId_t, nConsumerAppID AppId_t, unPage uint32) UGCQueryHandle
+	iSteamUGC_CreateQueryAllUGCRequestPage        func(steamUGC uintptr, eQueryType EUGCQuery, eMatchingeMatchingUGCTypeFileType EUGCMatchingUGCType, nCreatorAppID AppId_t, nConsumerAppID AppId_t, unPage uint32) UGCQueryHandle
+	iSteamUGC_CreateQueryAllUGCRequestCursor      func(steamUGC uintptr, eQueryType EUGCQuery, eMatchingeMatchingUGCTypeFileType EUGCMatchingUGCType, nCreatorAppID AppId_t, nConsumerAppID AppId_t, pchCursor string) UGCQueryHandle
 	iSteamUGC_CreateQueryUGCDetailsRequest        func(steamUGC uintptr, pvecPublishedFileID []PublishedFileId, unNumPublishedFileIDs uint32) UGCQueryHandle
 	iSteamUGC_SendQueryUGCRequest                 func(steamUGC uintptr, handle UGCQueryHandle) SteamAPICall
 	iSteamUGC_GetQueryUGCResult                   func(steamUGC uintptr, handle UGCQueryHandle, index uint32, pDetails *SteamUGCDetails) bool
@@ -5883,8 +5887,8 @@ var (
 	iSteamUGC_SetTimeCreatedDateRange             func(steamUGC uintptr, handle UGCQueryHandle, rtStart RTime32, rtEnd RTime32) bool
 	iSteamUGC_SetTimeUpdatedDateRange             func(steamUGC uintptr, handle UGCQueryHandle, rtStart RTime32, rtEnd RTime32) bool
 	iSteamUGC_AddRequiredKeyValueTag              func(steamUGC uintptr, handle UGCQueryHandle, pKey string, pValue string) bool
-	iSteamUGC_CreateItem                          func(steamUGC uintptr, nConsumerAppId AppId, eFileType EWorkshopFileType) SteamAPICall
-	iSteamUGC_StartItemUpdate                     func(steamUGC uintptr, nConsumerAppId AppId, nPublishedFileID PublishedFileId) UGCUpdateHandle
+	iSteamUGC_CreateItem                          func(steamUGC uintptr, nConsumerAppId AppId_t, eFileType EWorkshopFileType) SteamAPICall
+	iSteamUGC_StartItemUpdate                     func(steamUGC uintptr, nConsumerAppId AppId_t, nPublishedFileID PublishedFileId) UGCUpdateHandle
 	iSteamUGC_SetItemTitle                        func(steamUGC uintptr, handle UGCUpdateHandle, pchTitle string) bool
 	iSteamUGC_SetItemDescription                  func(steamUGC uintptr, handle UGCUpdateHandle, pchDescription string) bool
 	iSteamUGC_SetItemUpdateLanguage               func(steamUGC uintptr, handle UGCUpdateHandle, pchLanguage string) bool
@@ -5909,8 +5913,8 @@ var (
 	iSteamUGC_GetItemUpdateProgress               func(steamUGC uintptr, handle UGCUpdateHandle, punBytesProcessed *uint64, punBytesTotal *uint64) EItemUpdateStatus
 	iSteamUGC_SetUserItemVote                     func(steamUGC uintptr, nPublishedFileID PublishedFileId, bVoteUp bool) SteamAPICall
 	iSteamUGC_GetUserItemVote                     func(steamUGC uintptr, nPublishedFileID PublishedFileId) SteamAPICall
-	iSteamUGC_AddItemToFavorites                  func(steamUGC uintptr, nAppId AppId, nPublishedFileID PublishedFileId) SteamAPICall
-	iSteamUGC_RemoveItemFromFavorites             func(steamUGC uintptr, nAppId AppId, nPublishedFileID PublishedFileId) SteamAPICall
+	iSteamUGC_AddItemToFavorites                  func(steamUGC uintptr, nAppId AppId_t, nPublishedFileID PublishedFileId) SteamAPICall
+	iSteamUGC_RemoveItemFromFavorites             func(steamUGC uintptr, nAppId AppId_t, nPublishedFileID PublishedFileId) SteamAPICall
 	iSteamUGC_SubscribeItem                       func(steamUGC uintptr, nPublishedFileID PublishedFileId) SteamAPICall
 	iSteamUGC_UnsubscribeItem                     func(steamUGC uintptr, nPublishedFileID PublishedFileId) SteamAPICall
 	iSteamUGC_GetNumSubscribedItems               func(steamUGC uintptr) uint32
@@ -5926,8 +5930,8 @@ var (
 	iSteamUGC_StopPlaytimeTrackingForAllItems     func(steamUGC uintptr) SteamAPICall
 	iSteamUGC_AddDependency                       func(steamUGC uintptr, nParentPublishedFileID PublishedFileId, nChildPublishedFileID PublishedFileId) SteamAPICall
 	iSteamUGC_RemoveDependency                    func(steamUGC uintptr, nParentPublishedFileID PublishedFileId, nChildPublishedFileID PublishedFileId) SteamAPICall
-	iSteamUGC_AddAppDependency                    func(steamUGC uintptr, nPublishedFileID PublishedFileId, nAppID AppId) SteamAPICall
-	iSteamUGC_RemoveAppDependency                 func(steamUGC uintptr, nPublishedFileID PublishedFileId, nAppID AppId) SteamAPICall
+	iSteamUGC_AddAppDependency                    func(steamUGC uintptr, nPublishedFileID PublishedFileId, nAppID AppId_t) SteamAPICall
+	iSteamUGC_RemoveAppDependency                 func(steamUGC uintptr, nPublishedFileID PublishedFileId, nAppID AppId_t) SteamAPICall
 	iSteamUGC_GetAppDependencies                  func(steamUGC uintptr, nPublishedFileID PublishedFileId) SteamAPICall
 	iSteamUGC_DeleteItem                          func(steamUGC uintptr, nPublishedFileID PublishedFileId) SteamAPICall
 	iSteamUGC_ShowWorkshopEULA                    func(steamUGC uintptr) bool
@@ -5937,19 +5941,19 @@ var (
 
 type steamUGC uintptr
 
-func SteamUGC() steamUGC {
+func SteamUGC() ISteamUGC {
 	return steamUGC(steamUGC_init())
 }
 
-func (s steamUGC) CreateQueryUserUGCRequest(accountID AccountID, listType EUserUGCList, matchingUGCType EUGCMatchingUGCType, sortOrder EUserUGCListSortOrder, creatorAppID AppId, consumerAppID AppId, page uint32) UGCQueryHandle {
+func (s steamUGC) CreateQueryUserUGCRequest(accountID AccountID, listType EUserUGCList, matchingUGCType EUGCMatchingUGCType, sortOrder EUserUGCListSortOrder, creatorAppID AppId_t, consumerAppID AppId_t, page uint32) UGCQueryHandle {
 	return iSteamUGC_CreateQueryUserUGCRequest(uintptr(s), accountID, listType, matchingUGCType, sortOrder, creatorAppID, consumerAppID, page)
 }
 
-func (s steamUGC) CreateQueryAllUGCRequest(queryType EUGCQuery, matchingeMatchingUGCTypeFileType EUGCMatchingUGCType, creatorAppID AppId, consumerAppID AppId, page uint32) UGCQueryHandle {
+func (s steamUGC) CreateQueryAllUGCRequest(queryType EUGCQuery, matchingeMatchingUGCTypeFileType EUGCMatchingUGCType, creatorAppID AppId_t, consumerAppID AppId_t, page uint32) UGCQueryHandle {
 	return iSteamUGC_CreateQueryAllUGCRequestPage(uintptr(s), queryType, matchingeMatchingUGCTypeFileType, creatorAppID, consumerAppID, page)
 }
 
-func (s steamUGC) CreateQueryAllUGCRequestCursor(queryType EUGCQuery, matchingeMatchingUGCTypeFileType EUGCMatchingUGCType, creatorAppID AppId, consumerAppID AppId, cursor string) UGCQueryHandle {
+func (s steamUGC) CreateQueryAllUGCRequestCursor(queryType EUGCQuery, matchingeMatchingUGCTypeFileType EUGCMatchingUGCType, creatorAppID AppId_t, consumerAppID AppId_t, cursor string) UGCQueryHandle {
 	return iSteamUGC_CreateQueryAllUGCRequestCursor(uintptr(s), queryType, matchingeMatchingUGCTypeFileType, creatorAppID, consumerAppID, cursor)
 }
 
@@ -6140,12 +6144,12 @@ func (s steamUGC) AddRequiredKeyValueTag(handle UGCQueryHandle, key string, valu
 	return iSteamUGC_AddRequiredKeyValueTag(uintptr(s), handle, key, value)
 }
 
-func (s steamUGC) CreateItem(consumerAppId AppId, fileType EWorkshopFileType) CallResult[CreateItemResult] {
+func (s steamUGC) CreateItem(consumerAppId AppId_t, fileType EWorkshopFileType) CallResult[CreateItemResult] {
 	handle := iSteamUGC_CreateItem(uintptr(s), consumerAppId, fileType)
 	return CallResult[CreateItemResult]{Handle: handle}
 }
 
-func (s steamUGC) StartItemUpdate(consumerAppId AppId, publishedFileID PublishedFileId) UGCUpdateHandle {
+func (s steamUGC) StartItemUpdate(consumerAppId AppId_t, publishedFileID PublishedFileId) UGCUpdateHandle {
 	return iSteamUGC_StartItemUpdate(uintptr(s), consumerAppId, publishedFileID)
 }
 
@@ -6249,12 +6253,12 @@ func (s steamUGC) GetUserItemVote(publishedFileID PublishedFileId) CallResult[Ge
 	return CallResult[GetUserItemVoteResult]{Handle: handle}
 }
 
-func (s steamUGC) AddItemToFavorites(appId AppId, publishedFileID PublishedFileId) CallResult[UserFavoriteItemsListChanged] {
+func (s steamUGC) AddItemToFavorites(appId AppId_t, publishedFileID PublishedFileId) CallResult[UserFavoriteItemsListChanged] {
 	handle := iSteamUGC_AddItemToFavorites(uintptr(s), appId, publishedFileID)
 	return CallResult[UserFavoriteItemsListChanged]{Handle: handle}
 }
 
-func (s steamUGC) RemoveItemFromFavorites(appId AppId, publishedFileID PublishedFileId) CallResult[UserFavoriteItemsListChanged] {
+func (s steamUGC) RemoveItemFromFavorites(appId AppId_t, publishedFileID PublishedFileId) CallResult[UserFavoriteItemsListChanged] {
 	handle := iSteamUGC_RemoveItemFromFavorites(uintptr(s), appId, publishedFileID)
 	return CallResult[UserFavoriteItemsListChanged]{Handle: handle}
 }
@@ -6333,12 +6337,12 @@ func (s steamUGC) RemoveDependency(parentPublishedFileID PublishedFileId, childP
 	return CallResult[RemoveUGCDependencyResult]{Handle: handle}
 }
 
-func (s steamUGC) AddAppDependency(publishedFileID PublishedFileId, appID AppId) CallResult[AddAppDependencyResult] {
+func (s steamUGC) AddAppDependency(publishedFileID PublishedFileId, appID AppId_t) CallResult[AddAppDependencyResult] {
 	handle := iSteamUGC_AddAppDependency(uintptr(s), publishedFileID, appID)
 	return CallResult[AddAppDependencyResult]{Handle: handle}
 }
 
-func (s steamUGC) RemoveAppDependency(publishedFileID PublishedFileId, appID AppId) CallResult[RemoveAppDependencyResult] {
+func (s steamUGC) RemoveAppDependency(publishedFileID PublishedFileId, appID AppId_t) CallResult[RemoveAppDependencyResult] {
 	handle := iSteamUGC_RemoveAppDependency(uintptr(s), publishedFileID, appID)
 	return CallResult[RemoveAppDependencyResult]{Handle: handle}
 }
@@ -6376,63 +6380,63 @@ const (
 type EDurationControlNotification int32
 
 const (
-	EDurationControlNotificationNone          EDurationControlNotification = 0
-	EDurationControlNotification1Hour         EDurationControlNotification = 1
-	EDurationControlNotification3Hours        EDurationControlNotification = 2
-	EDurationControlNotificationHalfProgress  EDurationControlNotification = 3
-	EDurationControlNotificationNoProgress    EDurationControlNotification = 4
-	EDurationControlNotificationExitSoon3h    EDurationControlNotification = 5
-	EDurationControlNotificationExitSoon5h    EDurationControlNotification = 6
-	EDurationControlNotificationExitSoonNight EDurationControlNotification = 7
+	EDurationControl_Notification_None          EDurationControlNotification = 0
+	EDurationControl_Notification_1Hour         EDurationControlNotification = 1
+	EDurationControl_Notification_3Hours        EDurationControlNotification = 2
+	EDurationControl_Notification_HalfProgress  EDurationControlNotification = 3
+	EDurationControl_Notification_NoProgress    EDurationControlNotification = 4
+	EDurationControl_Notification_ExitSoon3h    EDurationControlNotification = 5
+	EDurationControl_Notification_ExitSoon5h    EDurationControlNotification = 6
+	EDurationControl_Notification_ExitSoonNight EDurationControlNotification = 7
 )
 
 type EDurationControlProgress int32
 
 const (
-	EDurationControlProgressFull  EDurationControlProgress = 0
-	EDurationControlProgressHalf  EDurationControlProgress = 1
-	EDurationControlProgressNone  EDurationControlProgress = 2
-	EDurationControlExitSoon3h    EDurationControlProgress = 3
-	EDurationControlExitSoon5h    EDurationControlProgress = 4
-	EDurationControlExitSoonNight EDurationControlProgress = 5
+	EDurationControl_ProgressFull  EDurationControlProgress = 0
+	EDurationControl_ProgressHalf  EDurationControlProgress = 1
+	EDurationControl_ProgressNone  EDurationControlProgress = 2
+	EDurationControl_ExitSoon3h    EDurationControlProgress = 3
+	EDurationControl_ExitSoon5h    EDurationControlProgress = 4
+	EDurationControl_ExitSoonNight EDurationControlProgress = 5
 )
 
 type EMarketNotAllowedReasonFlags int32
 
 const (
-	EMarketNotAllowedReasonNone                             EMarketNotAllowedReasonFlags = 0
-	EMarketNotAllowedReasonTemporaryFailure                 EMarketNotAllowedReasonFlags = 1
-	EMarketNotAllowedReasonAccountDisabled                  EMarketNotAllowedReasonFlags = 2
-	EMarketNotAllowedReasonAccountLockedDown                EMarketNotAllowedReasonFlags = 4
-	EMarketNotAllowedReasonAccountLimited                   EMarketNotAllowedReasonFlags = 8
-	EMarketNotAllowedReasonTradeBanned                      EMarketNotAllowedReasonFlags = 16
-	EMarketNotAllowedReasonAccountNotTrusted                EMarketNotAllowedReasonFlags = 32
-	EMarketNotAllowedReasonSteamGuardNotEnabled             EMarketNotAllowedReasonFlags = 64
-	EMarketNotAllowedReasonSteamGuardOnlyRecentlyEnabled    EMarketNotAllowedReasonFlags = 128
-	EMarketNotAllowedReasonRecentPasswordReset              EMarketNotAllowedReasonFlags = 256
-	EMarketNotAllowedReasonNewPaymentMethod                 EMarketNotAllowedReasonFlags = 512
-	EMarketNotAllowedReasonInvalidCookie                    EMarketNotAllowedReasonFlags = 1024
-	EMarketNotAllowedReasonUsingNewDevice                   EMarketNotAllowedReasonFlags = 2048
-	EMarketNotAllowedReasonRecentSelfRefund                 EMarketNotAllowedReasonFlags = 4096
-	EMarketNotAllowedReasonNewPaymentMethodCannotBeVerified EMarketNotAllowedReasonFlags = 8192
-	EMarketNotAllowedReasonNoRecentPurchases                EMarketNotAllowedReasonFlags = 16384
-	EMarketNotAllowedReasonAcceptedWalletGift               EMarketNotAllowedReasonFlags = 32768
+	EMarketNotAllowedReason_None                             EMarketNotAllowedReasonFlags = 0
+	EMarketNotAllowedReason_TemporaryFailure                 EMarketNotAllowedReasonFlags = 1
+	EMarketNotAllowedReason_AccountDisabled                  EMarketNotAllowedReasonFlags = 2
+	EMarketNotAllowedReason_AccountLockedDown                EMarketNotAllowedReasonFlags = 4
+	EMarketNotAllowedReason_AccountLimited                   EMarketNotAllowedReasonFlags = 8
+	EMarketNotAllowedReason_TradeBanned                      EMarketNotAllowedReasonFlags = 16
+	EMarketNotAllowedReason_AccountNotTrusted                EMarketNotAllowedReasonFlags = 32
+	EMarketNotAllowedReason_SteamGuardNotEnabled             EMarketNotAllowedReasonFlags = 64
+	EMarketNotAllowedReason_SteamGuardOnlyRecentlyEnabled    EMarketNotAllowedReasonFlags = 128
+	EMarketNotAllowedReason_RecentPasswordReset              EMarketNotAllowedReasonFlags = 256
+	EMarketNotAllowedReason_NewPaymentMethod                 EMarketNotAllowedReasonFlags = 512
+	EMarketNotAllowedReason_InvalidCookie                    EMarketNotAllowedReasonFlags = 1024
+	EMarketNotAllowedReason_UsingNewDevice                   EMarketNotAllowedReasonFlags = 2048
+	EMarketNotAllowedReason_RecentSelfRefund                 EMarketNotAllowedReasonFlags = 4096
+	EMarketNotAllowedReason_NewPaymentMethodCannotBeVerified EMarketNotAllowedReasonFlags = 8192
+	EMarketNotAllowedReason_NoRecentPurchases                EMarketNotAllowedReasonFlags = 16384
+	EMarketNotAllowedReason_AcceptedWalletGift               EMarketNotAllowedReasonFlags = 32768
 )
 
 type EAuthSessionResponse int32
 
 const (
-	EAuthSessionResponseOK                               EAuthSessionResponse = 0
-	EAuthSessionResponseUserNotConnectedToSteam          EAuthSessionResponse = 1
-	EAuthSessionResponseNoLicenseOrExpired               EAuthSessionResponse = 2
-	EAuthSessionResponseVACBanned                        EAuthSessionResponse = 3
-	EAuthSessionResponseLoggedInElseWhere                EAuthSessionResponse = 4
-	EAuthSessionResponseVACCheckTimedOut                 EAuthSessionResponse = 5
-	EAuthSessionResponseAuthTicketCanceled               EAuthSessionResponse = 6
-	EAuthSessionResponseAuthTicketInvalidAlreadyUsed     EAuthSessionResponse = 7
-	EAuthSessionResponseAuthTicketInvalid                EAuthSessionResponse = 8
-	EAuthSessionResponsePublisherIssuedBan               EAuthSessionResponse = 9
-	EAuthSessionResponseAuthTicketNetworkIdentityFailure EAuthSessionResponse = 10
+	EAuthSessionResponse_OK                               EAuthSessionResponse = 0
+	EAuthSessionResponse_UserNotConnectedToSteam          EAuthSessionResponse = 1
+	EAuthSessionResponse_NoLicenseOrExpired               EAuthSessionResponse = 2
+	EAuthSessionResponse_VACBanned                        EAuthSessionResponse = 3
+	EAuthSessionResponse_LoggedInElseWhere                EAuthSessionResponse = 4
+	EAuthSessionResponse_VACCheckTimedOut                 EAuthSessionResponse = 5
+	EAuthSessionResponse_AuthTicketCanceled               EAuthSessionResponse = 6
+	EAuthSessionResponse_AuthTicketInvalidAlreadyUsed     EAuthSessionResponse = 7
+	EAuthSessionResponse_AuthTicketInvalid                EAuthSessionResponse = 8
+	EAuthSessionResponse_PublisherIssuedBan               EAuthSessionResponse = 9
+	EAuthSessionResponse_AuthTicketNetworkIdentityFailure EAuthSessionResponse = 10
 )
 
 type HAuthTicket uint
@@ -6440,51 +6444,51 @@ type HAuthTicket uint
 type EVoiceResult int32
 
 const (
-	EVoiceResultOK                   EVoiceResult = 0
-	EVoiceResultNotInitialized       EVoiceResult = 1
-	EVoiceResultNotRecording         EVoiceResult = 2
-	EVoiceResultNoData               EVoiceResult = 3
-	EVoiceResultBufferTooSmall       EVoiceResult = 4
-	EVoiceResultDataCorrupted        EVoiceResult = 5
-	EVoiceResultRestricted           EVoiceResult = 6
-	EVoiceResultUnsupportedCodec     EVoiceResult = 7
-	EVoiceResultReceiverOutOfDate    EVoiceResult = 8
-	EVoiceResultReceiverDidNotAnswer EVoiceResult = 9
+	EVoiceResult_OK                   EVoiceResult = 0
+	EVoiceResult_NotInitialized       EVoiceResult = 1
+	EVoiceResult_NotRecording         EVoiceResult = 2
+	EVoiceResult_NoData               EVoiceResult = 3
+	EVoiceResult_BufferTooSmall       EVoiceResult = 4
+	EVoiceResult_DataCorrupted        EVoiceResult = 5
+	EVoiceResult_Restricted           EVoiceResult = 6
+	EVoiceResult_UnsupportedCodec     EVoiceResult = 7
+	EVoiceResult_ReceiverOutOfDate    EVoiceResult = 8
+	EVoiceResult_ReceiverDidNotAnswer EVoiceResult = 9
 )
 
 type EDurationControlOnlineState int32
 
 const (
-	EDurationControlOnlineStateInvalid       EDurationControlOnlineState = 0
-	EDurationControlOnlineStateOffline       EDurationControlOnlineState = 1
-	EDurationControlOnlineStateOnline        EDurationControlOnlineState = 2
-	EDurationControlOnlineStateOnlineHighPri EDurationControlOnlineState = 3
+	EDurationControlOnlineState_Invalid       EDurationControlOnlineState = 0
+	EDurationControlOnlineState_Offline       EDurationControlOnlineState = 1
+	EDurationControlOnlineState_Online        EDurationControlOnlineState = 2
+	EDurationControlOnlineState_OnlineHighPri EDurationControlOnlineState = 3
 )
 
 type EUserHasLicenseForAppResult int32
 
 const (
-	EUserHasLicenseResultHasLicense         EUserHasLicenseForAppResult = 0
-	EUserHasLicenseResultDoesNotHaveLicense EUserHasLicenseForAppResult = 1
-	EUserHasLicenseResultNoAuth             EUserHasLicenseForAppResult = 2
+	EUserHasLicenseResult_HasLicense         EUserHasLicenseForAppResult = 0
+	EUserHasLicenseResult_DoesNotHaveLicense EUserHasLicenseForAppResult = 1
+	EUserHasLicenseResult_NoAuth             EUserHasLicenseForAppResult = 2
 )
 
 type EBeginAuthSessionResult int32
 
 const (
-	EBeginAuthSessionResultOK               EBeginAuthSessionResult = 0
-	EBeginAuthSessionResultInvalidTicket    EBeginAuthSessionResult = 1
-	EBeginAuthSessionResultDuplicateRequest EBeginAuthSessionResult = 2
-	EBeginAuthSessionResultInvalidVersion   EBeginAuthSessionResult = 3
-	EBeginAuthSessionResultGameMismatch     EBeginAuthSessionResult = 4
-	EBeginAuthSessionResultExpiredTicket    EBeginAuthSessionResult = 5
+	EBeginAuthSessionResult_OK               EBeginAuthSessionResult = 0
+	EBeginAuthSessionResult_InvalidTicket    EBeginAuthSessionResult = 1
+	EBeginAuthSessionResult_DuplicateRequest EBeginAuthSessionResult = 2
+	EBeginAuthSessionResult_InvalidVersion   EBeginAuthSessionResult = 3
+	EBeginAuthSessionResult_GameMismatch     EBeginAuthSessionResult = 4
+	EBeginAuthSessionResult_ExpiredTicket    EBeginAuthSessionResult = 5
 )
 
 var (
 	steamUser_init                            func() uintptr
 	iSteamUser_GetHSteamUser                  func(steamUser uintptr) HSteamUser
 	iSteamUser_BLoggedOn                      func(steamUser uintptr) bool
-	iSteamUser_GetSteamID                     func(steamUser uintptr) Uint64SteamID
+	iSteamUser_GetSteamID                     func(steamUser uintptr) CSteamID
 	iSteamUser_TrackAppUsageEvent             func(steamUser uintptr, gameID Uint64SteamID, eAppUsageEvent int32, pchExtraInfo string)
 	iSteamUser_GetUserDataFolder              func(steamUser uintptr, pchBuffer []byte, cubBuffer int32) bool
 	iSteamUser_StartVoiceRecording            func(steamUser uintptr)
@@ -6498,7 +6502,7 @@ var (
 	iSteamUser_BeginAuthSession               func(steamUser uintptr, pAuthTicket []byte, cbAuthTicket int32, steamID Uint64SteamID) EBeginAuthSessionResult
 	iSteamUser_EndAuthSession                 func(steamUser uintptr, steamID Uint64SteamID)
 	iSteamUser_CancelAuthTicket               func(steamUser uintptr, hAuthTicket HAuthTicket)
-	iSteamUser_UserHasLicenseForApp           func(steamUser uintptr, steamID Uint64SteamID, appID AppId) EUserHasLicenseForAppResult
+	iSteamUser_UserHasLicenseForApp           func(steamUser uintptr, steamID Uint64SteamID, appID AppId_t) EUserHasLicenseForAppResult
 	iSteamUser_BIsBehindNAT                   func(steamUser uintptr) bool
 	iSteamUser_AdvertiseGame                  func(steamUser uintptr, steamIDGameServer Uint64SteamID, unIPServer uint32, usPortServer uint16)
 	iSteamUser_RequestEncryptedAppTicket      func(steamUser uintptr, pDataToInclude []byte, cbDataToInclude int32) SteamAPICall
@@ -6552,7 +6556,7 @@ const (
 
 type steamUser uintptr
 
-func SteamUser() steamUser {
+func SteamUser() ISteamUser {
 	return steamUser(steamUser_init())
 }
 
@@ -6564,7 +6568,7 @@ func (s steamUser) BLoggedOn() bool {
 	return iSteamUser_BLoggedOn(uintptr(s))
 }
 
-func (s steamUser) GetSteamID() Uint64SteamID {
+func (s steamUser) GetSteamID() CSteamID {
 	return iSteamUser_GetSteamID(uintptr(s))
 }
 
@@ -6635,7 +6639,7 @@ func (s steamUser) CancelAuthTicket(hAuthTicket HAuthTicket) {
 	iSteamUser_CancelAuthTicket(uintptr(s), hAuthTicket)
 }
 
-func (s steamUser) UserHasLicenseForApp(steamID Uint64SteamID, appID AppId) EUserHasLicenseForAppResult {
+func (s steamUser) UserHasLicenseForApp(steamID Uint64SteamID, appID AppId_t) EUserHasLicenseForAppResult {
 	return iSteamUser_UserHasLicenseForApp(uintptr(s), steamID, appID)
 }
 
@@ -6719,35 +6723,35 @@ type LeaderboardEntry struct {
 type ELeaderboardDataRequest int32
 
 const (
-	ELeaderboardDataRequestGlobal           ELeaderboardDataRequest = 0
-	ELeaderboardDataRequestGlobalAroundUser ELeaderboardDataRequest = 1
-	ELeaderboardDataRequestFriends          ELeaderboardDataRequest = 2
-	ELeaderboardDataRequestUsers            ELeaderboardDataRequest = 3
+	ELeaderboardDataRequest_Global           ELeaderboardDataRequest = 0
+	ELeaderboardDataRequest_GlobalAroundUser ELeaderboardDataRequest = 1
+	ELeaderboardDataRequest_Friends          ELeaderboardDataRequest = 2
+	ELeaderboardDataRequest_Users            ELeaderboardDataRequest = 3
 )
 
 type ELeaderboardSortMethod int32
 
 const (
-	ELeaderboardSortMethodNone       ELeaderboardSortMethod = 0
-	ELeaderboardSortMethodAscending  ELeaderboardSortMethod = 1
-	ELeaderboardSortMethodDescending ELeaderboardSortMethod = 2
+	ELeaderboardSortMethod_None       ELeaderboardSortMethod = 0
+	ELeaderboardSortMethod_Ascending  ELeaderboardSortMethod = 1
+	ELeaderboardSortMethod_Descending ELeaderboardSortMethod = 2
 )
 
 type ELeaderboardDisplayType int32
 
 const (
-	ELeaderboardDisplayTypeNone             ELeaderboardDisplayType = 0
-	ELeaderboardDisplayTypeNumeric          ELeaderboardDisplayType = 1
-	ELeaderboardDisplayTypeTimeSeconds      ELeaderboardDisplayType = 2
-	ELeaderboardDisplayTypeTimeMilliSeconds ELeaderboardDisplayType = 3
+	ELeaderboardDisplayType_None             ELeaderboardDisplayType = 0
+	ELeaderboardDisplayType_Numeric          ELeaderboardDisplayType = 1
+	ELeaderboardDisplayType_TimeSeconds      ELeaderboardDisplayType = 2
+	ELeaderboardDisplayType_TimeMilliSeconds ELeaderboardDisplayType = 3
 )
 
 type ELeaderboardUploadScoreMethod int32
 
 const (
-	ELeaderboardUploadScoreMethodNone        ELeaderboardUploadScoreMethod = 0
-	ELeaderboardUploadScoreMethodKeepBest    ELeaderboardUploadScoreMethod = 1
-	ELeaderboardUploadScoreMethodForceUpdate ELeaderboardUploadScoreMethod = 2
+	ELeaderboardUploadScoreMethod_None        ELeaderboardUploadScoreMethod = 0
+	ELeaderboardUploadScoreMethod_KeepBest    ELeaderboardUploadScoreMethod = 1
+	ELeaderboardUploadScoreMethod_ForceUpdate ELeaderboardUploadScoreMethod = 2
 )
 
 type SteamLeaderboard uint64
@@ -6851,7 +6855,7 @@ var (
 
 type steamUserStats uintptr
 
-func SteamUserStats() steamUserStats {
+func SteamUserStats() ISteamUserStats {
 	return steamUserStats(steamUserStats_init())
 }
 
@@ -7070,59 +7074,59 @@ func (s steamUserStats) GetAchievementProgressLimitsFloat(name string) (minProgr
 type ESteamIPv6ConnectivityState int32
 
 const (
-	ESteamIPv6ConnectivityStateUnknown ESteamIPv6ConnectivityState = 0
-	ESteamIPv6ConnectivityStateGood    ESteamIPv6ConnectivityState = 1
-	ESteamIPv6ConnectivityStateBad     ESteamIPv6ConnectivityState = 2
+	ESteamIPv6ConnectivityState_Unknown ESteamIPv6ConnectivityState = 0
+	ESteamIPv6ConnectivityState_Good    ESteamIPv6ConnectivityState = 1
+	ESteamIPv6ConnectivityState_Bad     ESteamIPv6ConnectivityState = 2
 )
 
 type EFloatingGamepadTextInputMode int32
 
 const (
-	EFloatingGamepadTextInputModeModeSingleLine    EFloatingGamepadTextInputMode = 0
-	EFloatingGamepadTextInputModeModeMultipleLines EFloatingGamepadTextInputMode = 1
-	EFloatingGamepadTextInputModeModeEmail         EFloatingGamepadTextInputMode = 2
-	EFloatingGamepadTextInputModeModeNumeric       EFloatingGamepadTextInputMode = 3
+	EFloatingGamepadTextInputMode_ModeSingleLine    EFloatingGamepadTextInputMode = 0
+	EFloatingGamepadTextInputMode_ModeMultipleLines EFloatingGamepadTextInputMode = 1
+	EFloatingGamepadTextInputMode_ModeEmail         EFloatingGamepadTextInputMode = 2
+	EFloatingGamepadTextInputMode_ModeNumeric       EFloatingGamepadTextInputMode = 3
 )
 
 type ETextFilteringContext int32
 
 const (
-	ETextFilteringContextUnknown     ETextFilteringContext = 0
-	ETextFilteringContextGameContent ETextFilteringContext = 1
-	ETextFilteringContextChat        ETextFilteringContext = 2
-	ETextFilteringContextName        ETextFilteringContext = 3
+	ETextFilteringContext_Unknown     ETextFilteringContext = 0
+	ETextFilteringContext_GameContent ETextFilteringContext = 1
+	ETextFilteringContext_Chat        ETextFilteringContext = 2
+	ETextFilteringContext_Name        ETextFilteringContext = 3
 )
 
 type ESteamIPv6ConnectivityProtocol int32
 
 const (
-	ESteamIPv6ConnectivityProtocolInvalid ESteamIPv6ConnectivityProtocol = 0
-	ESteamIPv6ConnectivityProtocolHTTP    ESteamIPv6ConnectivityProtocol = 1
-	ESteamIPv6ConnectivityProtocolUDP     ESteamIPv6ConnectivityProtocol = 2
+	ESteamIPv6ConnectivityProtocol_Invalid ESteamIPv6ConnectivityProtocol = 0
+	ESteamIPv6ConnectivityProtocol_HTTP    ESteamIPv6ConnectivityProtocol = 1
+	ESteamIPv6ConnectivityProtocol_UDP     ESteamIPv6ConnectivityProtocol = 2
 )
 
 type ENotificationPosition int32
 
 const (
-	EPositionInvalid     ENotificationPosition = -1
-	EPositionTopLeft     ENotificationPosition = 0
-	EPositionTopRight    ENotificationPosition = 1
-	EPositionBottomLeft  ENotificationPosition = 2
-	EPositionBottomRight ENotificationPosition = 3
+	EPosition_Invalid     ENotificationPosition = -1
+	EPosition_TopLeft     ENotificationPosition = 0
+	EPosition_TopRight    ENotificationPosition = 1
+	EPosition_BottomLeft  ENotificationPosition = 2
+	EPosition_BottomRight ENotificationPosition = 3
 )
 
 type EGamepadTextInputMode int32
 
 const (
-	EGamepadTextInputModeNormal   EGamepadTextInputMode = 0
-	EGamepadTextInputModePassword EGamepadTextInputMode = 1
+	EGamepadTextInputMode_Normal   EGamepadTextInputMode = 0
+	EGamepadTextInputMode_Password EGamepadTextInputMode = 1
 )
 
 type EGamepadTextInputLineMode int32
 
 const (
-	EGamepadTextInputLineModeSingleLine    EGamepadTextInputLineMode = 0
-	EGamepadTextInputLineModeMultipleLines EGamepadTextInputLineMode = 1
+	EGamepadTextInputLineMode_SingleLine    EGamepadTextInputLineMode = 0
+	EGamepadTextInputLineMode_MultipleLines EGamepadTextInputLineMode = 1
 )
 
 var (
@@ -7209,7 +7213,7 @@ const (
 
 type steamUtils uintptr
 
-func SteamUtils() steamUtils {
+func SteamUtils() ISteamUtils {
 	return steamUtils(steamUtils_init())
 }
 

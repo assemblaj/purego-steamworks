@@ -4,7 +4,7 @@ import (
 	"unsafe"
 )
 
-func dispatchCallback(callback *CallbackMsg) {
+func dispatchCallback(callback *callbackMsg) {
 	if GameServerActive {
 		switch SteamCallbackID(callback.Callback) {
 		case GSStatsReceivedID:

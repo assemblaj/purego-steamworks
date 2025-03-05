@@ -13,7 +13,7 @@ type CallResult[T Callback] struct {
 
 func (cr CallResult[T]) String() string {
 	var zero T
-	return fmt.Sprintf("%s API HANDLE: %d", zero, cr.Handle)
+	return fmt.Sprintf("%s API Handle: %d", zero, cr.Handle)
 }
 
 func callbackString(callback Callback) string {
@@ -57,7 +57,9 @@ func handleRawData[T Callback](callbackID SteamCallbackID, rawcallbackdata unsaf
 	registry.mu.RUnlock()
 
 	if !exists {
-		fmt.Printf("No handler registered for %s\n", zero.String())
+		if debugMode {
+			fmt.Printf("No handler registered for %s\n", zero.String())
+		}
 		return
 	}
 
@@ -66,9 +68,11 @@ func handleRawData[T Callback](callbackID SteamCallbackID, rawcallbackdata unsaf
 	if typedHandler, ok := handler.(callbackHandler[T]); ok {
 		typedHandler(result)
 	} else {
-		fmt.Printf("Type: %T\n", handler)
+		if debugMode {
+			fmt.Printf("Type: %T\n", handler)
 
-		fmt.Printf("Type mismatch for %s\n", zero.String())
+			fmt.Printf("Type mismatch for %s\n", zero.String())
+		}
 	}
 }
 
@@ -87,7 +91,9 @@ func handleRawResult[T Callback](apiHandle SteamAPICall, failed bool, rawcallbac
 	registry.mu.Unlock()
 
 	if !exists {
-		fmt.Printf("No handler registered for API handle %d, %s \n", apiHandle, zero.String())
+		if debugMode {
+			fmt.Printf("No handler registered for API handle %d, %s \n", apiHandle, zero.String())
+		}
 		return
 	}
 
@@ -99,9 +105,11 @@ func handleRawResult[T Callback](apiHandle SteamAPICall, failed bool, rawcallbac
 		delete(registry.callResults, apiHandle)
 		registry.mu.Unlock()
 	} else {
-		fmt.Printf("Type: %T\n", handler)
+		if debugMode {
+			fmt.Printf("Type: %T\n", handler)
 
-		fmt.Printf("Type mismatch for apiHandle %d, %s\n", apiHandle, zero.String())
+			fmt.Printf("Type mismatch for apiHandle %d, %s\n", apiHandle, zero.String())
+		}
 	}
 }
 
@@ -109,9 +117,9 @@ var (
 	getHSteamPipe                   func() uintptr
 	manualdispatch_init             func()
 	manualdispatch_runFrame         func(HSteamPipe)
-	manualdispatch_getNextCallback  func(HSteamPipe, *CallbackMsg) bool
+	manualdispatch_getNextCallback  func(HSteamPipe, *callbackMsg) bool
 	manualdispatch_freeLastCallback func(HSteamPipe)
-	manualdispatch_getApiCallResult func(hSteamPipe HSteamPipe, hSteamAPICall SteamAPICall, pCallback uintptr, cubCallback int, iCallbackExpected int, pbFailed uintptr) bool
+	manualdispatch_getApiCallResult func(hSteamPipe HSteamPipe, hSteamAPICall SteamAPICall, pCallback []byte, cubCallback int, iCallbackExpected int, pbFailed *bool) bool
 )
 
 const (
@@ -139,20 +147,17 @@ func RunCallbacks() {
 
 	pipe := HSteamPipe(getHSteamPipe())
 	manualdispatch_runFrame(pipe)
-	var msg CallbackMsg
+	var msg callbackMsg
 	for manualdispatch_getNextCallback(pipe, &msg) {
 		if SteamCallbackID(msg.Callback) == SteamAPICallCompletedID {
 			pCallCompleted := (*SteamAPICallCompleted)(unsafe.Pointer(msg.ParamData))
-			pTmpCallResult := uintptr(unsafe.Pointer(&make([]byte, pCallCompleted.Param)[0]))
+			pTmpCallResult := make([]byte, pCallCompleted.Param)
 			var failed bool
-			if manualdispatch_getApiCallResult(pipe, pCallCompleted.AsyncCall, pTmpCallResult, int(pCallCompleted.Param), int(pCallCompleted.Callback), uintptr(unsafe.Pointer(&failed))) {
-				dispatchCallResult(pCallCompleted.AsyncCall, failed, pTmpCallResult, SteamCallbackID(pCallCompleted.Callback))
+			if manualdispatch_getApiCallResult(pipe, pCallCompleted.AsyncCall, pTmpCallResult, int(pCallCompleted.Param), int(pCallCompleted.Callback), &failed) {
+				dispatchCallResult(pCallCompleted.AsyncCall, failed, uintptr(unsafe.Pointer(&pTmpCallResult[0])), SteamCallbackID(pCallCompleted.Callback))
 			}
-			//runtime.KeepAlive(pCallCompleted)
-			//runtime.KeepAlive(pTmpCallResult)
 		} else {
 			dispatchCallback(&msg)
-			//runtime.KeepAlive(msg)
 		}
 		manualdispatch_freeLastCallback(pipe)
 	}

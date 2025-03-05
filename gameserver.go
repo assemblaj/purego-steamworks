@@ -12,10 +12,10 @@ const (
 type EServerMode int32
 
 const (
-	ServerModeInvalid                 EServerMode = 0 // DO NOT USE
-	ServerModeNoAuthentication        EServerMode = 1 // Don't authenticate user logins and don't list on the server list
-	ServerModeAuthentication          EServerMode = 2 // Authenticate users, list on the server list, don't run VAC on clients that connect
-	ServerModeAuthenticationAndSecure EServerMode = 3 // Authenticate users, list on the server list and VAC protect clients
+	ServerMode_Invalid                 EServerMode = 0 // DO NOT USE
+	ServerMode_NoAuthentication        EServerMode = 1 // Don't authenticate user logins and don't list on the server list
+	ServerMode_Authentication          EServerMode = 2 // Authenticate users, list on the server list, don't run VAC on clients that connect
+	ServerMode_AuthenticationAndSecure EServerMode = 3 // Authenticate users, list on the server list and VAC protect clients
 )
 
 var (

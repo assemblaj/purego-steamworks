@@ -10,7 +10,7 @@ const (
 )
 
 type DlcInstalled struct {
-	AppID AppId
+	AppID AppId_t
 }
 type NewUrlLaunchParameters struct {
 }
@@ -30,7 +30,7 @@ type FileDetailsResult struct {
 }
 
 type TimedTrialStatus struct {
-	AppID          AppId
+	AppID          AppId_t
 	IsOffline      bool
 	_              [3]byte
 	SecondsAllowed uint32
@@ -148,7 +148,7 @@ type GameOverlayActivated struct {
 	Active        uint8
 	UserInitiated bool
 	_             [2]byte
-	AppID         AppId
+	AppID         AppId_t
 	OverlayPID    uint32
 }
 type GameServerChangeRequested struct {
@@ -172,7 +172,7 @@ type ClanOfficerListResponse struct {
 }
 type FriendRichPresenceUpdate struct {
 	SteamIDFriend CSteamID
-	AppID         AppId
+	AppID         AppId_t
 }
 type GameRichPresenceJoinRequested struct {
 	SteamIDFriend CSteamID
@@ -916,14 +916,14 @@ const (
 )
 
 type SteamInputDeviceConnected struct {
-	ConnectedDeviceHandle InputHandle
+	ConnectedDeviceHandle InputHandle_t
 }
 type SteamInputDeviceDisconnected struct {
-	DisconnectedDeviceHandle InputHandle
+	DisconnectedDeviceHandle InputHandle_t
 }
 type SteamInputConfigurationLoaded struct {
-	AppID             AppId
-	DeviceHandle      InputHandle
+	AppID             AppId_t
+	DeviceHandle      InputHandle_t
 	MappingCreator    CSteamID
 	MajorRevision     uint32
 	MinorRevision     uint32
@@ -932,8 +932,8 @@ type SteamInputConfigurationLoaded struct {
 	_                 [2]byte
 }
 type SteamInputGamepadSlotChange struct {
-	AppID          AppId
-	DeviceHandle   InputHandle
+	AppID          AppId_t
+	DeviceHandle   InputHandle_t
 	DeviceType     ESteamInputType
 	OldGamepadSlot int32
 	NewGamepadSlot int32
@@ -1722,7 +1722,7 @@ type RemoteStorageUpdatePublishedFileResult struct {
 type RemoteStorageDownloadUGCResult struct {
 	Result       EResult
 	File         UGCHandle
-	AppID        AppId
+	AppID        AppId_t
 	SizeInBytes  int32
 	FileName     [260]byte
 	SteamIDOwner uint64
@@ -1730,8 +1730,8 @@ type RemoteStorageDownloadUGCResult struct {
 type RemoteStorageGetPublishedFileDetailsResult struct {
 	Result          EResult
 	PublishedFileId PublishedFileId
-	CreatorAppID    AppId
-	ConsumerAppID   AppId
+	CreatorAppID    AppId_t
+	ConsumerAppID   AppId_t
 	Title           [129]byte
 	Description     [8000]byte
 	File            UGCHandle
@@ -1759,7 +1759,7 @@ type RemoteStorageEnumerateWorkshopFilesResult struct {
 	TotalResultCount int32
 	PublishedFileId  [50]PublishedFileId
 	Score            [50]float32
-	AppId            AppId
+	AppId            AppId_t
 	StartIndex       uint32
 }
 type RemoteStorageGetPublishedItemVoteDetailsResult struct {
@@ -1772,15 +1772,15 @@ type RemoteStorageGetPublishedItemVoteDetailsResult struct {
 }
 type RemoteStoragePublishedFileSubscribed struct {
 	PublishedFileId PublishedFileId
-	AppID           AppId
+	AppID           AppId_t
 }
 type RemoteStoragePublishedFileUnsubscribed struct {
 	PublishedFileId PublishedFileId
-	AppID           AppId
+	AppID           AppId_t
 }
 type RemoteStoragePublishedFileDeleted struct {
 	PublishedFileId PublishedFileId
-	AppID           AppId
+	AppID           AppId_t
 }
 type RemoteStorageUpdateUserPublishedItemVoteResult struct {
 	Result          EResult
@@ -1817,7 +1817,7 @@ type RemoteStoragePublishFileProgress struct {
 }
 type RemoteStoragePublishedFileUpdated struct {
 	PublishedFileId PublishedFileId
-	AppID           AppId
+	AppID           AppId_t
 	Unused          uint64
 }
 type RemoteStorageFileWriteAsyncComplete struct {
@@ -2230,13 +2230,13 @@ type SubmitItemUpdateResult struct {
 	PublishedFileId                         PublishedFileId
 }
 type ItemInstalled struct {
-	AppID           AppId
+	AppID           AppId_t
 	PublishedFileId PublishedFileId
 	LegacyContent   UGCHandle
 	ManifestID      uint64
 }
 type DownloadItemResult struct {
-	AppID           AppId
+	AppID           AppId_t
 	PublishedFileId PublishedFileId
 	Result          EResult
 }
@@ -2277,17 +2277,17 @@ type RemoveUGCDependencyResult struct {
 type AddAppDependencyResult struct {
 	Result          EResult
 	PublishedFileId PublishedFileId
-	AppID           AppId
+	AppID           AppId_t
 }
 type RemoveAppDependencyResult struct {
 	Result          EResult
 	PublishedFileId PublishedFileId
-	AppID           AppId
+	AppID           AppId_t
 }
 type GetAppDependenciesResult struct {
 	Result                  EResult
 	PublishedFileId         PublishedFileId
-	AppIDs                  [32]AppId
+	AppIDs                  [32]AppId_t
 	NumAppDependencies      uint32
 	TotalNumAppDependencies uint32
 }
@@ -2296,11 +2296,11 @@ type DeleteItemResult struct {
 	PublishedFileId PublishedFileId
 }
 type UserSubscribedItemsListChanged struct {
-	AppID AppId
+	AppID AppId_t
 }
 type WorkshopEULAStatus struct {
 	Result      EResult
-	AppID       AppId
+	AppID       AppId_t
 	Version     uint32
 	Action      RTime32
 	Accepted    bool
@@ -2615,7 +2615,7 @@ type MarketEligibilityResponse struct {
 }
 type DurationControl struct {
 	Result       EResult
-	AppId        AppId
+	AppId        AppId_t
 	Applicable   bool
 	Last5h       int32
 	Progress     EDurationControlProgress
@@ -3067,7 +3067,7 @@ type CheckFileSignatureResult struct {
 type GamepadTextInputDismissed struct {
 	Submitted     bool
 	SubmittedText uint32
-	AppID         AppId
+	AppID         AppId_t
 }
 type AppResumingFromSuspend struct {
 }

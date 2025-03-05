@@ -18,7 +18,7 @@ type lint64 int64
 type ulint64 uint64
 type intp int64
 type uintp uint64
-type AppId uint
+type AppId_t uint32
 type DepotId uint
 type RTime32 uint
 type SteamAPICall uint64
@@ -30,7 +30,7 @@ type SteamErrMsg [1024]byte
 type UGCHandle uint64
 
 const (
-	AppIdInvalid             AppId        = 0x0
+	AppIdInvalid             AppId_t      = 0x0
 	DepotIdInvalid           DepotId      = 0x0
 	APICallInvalid           SteamAPICall = 0x0
 	AccountIdInvalid         AccountID    = 0
@@ -267,4 +267,8 @@ func structToUintptr[T any](s *T) uintptr {
 		return 0
 	}
 	return uintptr(unsafe.Pointer(s))
+}
+
+func bytesToStruct[T any](data []byte) *T {
+	return (*T)(unsafe.Pointer(&data[0]))
 }

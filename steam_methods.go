@@ -11,7 +11,7 @@ const (
 	ESteamAPIInitResult_VersionMismatch = 3 // Steam client appears to be out of date
 )
 
-type CallbackMsg struct {
+type callbackMsg struct {
 	SteamUser HSteamUser // Specific user to whom this callback applies.
 	Callback  int32      // Callback identifier.  (Corresponds to the k_iCallback enum in the callback structure.)
 	ParamData uintptr    // Points to the callback structure
@@ -48,6 +48,12 @@ var (
 	IsSteamRunning             func() bool
 	ReleaseCurrentThreadMemory func()
 )
+
+var debugMode bool = false
+
+func SetDebugMode(debugEnabled bool) {
+	debugMode = debugEnabled
+}
 
 func RestartAppiIfNecessary(appID uint32) bool {
 	result := restartAppiIfNecessary(int(appID))
