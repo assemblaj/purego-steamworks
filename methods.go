@@ -50,7 +50,7 @@ const (
 )
 
 var (
-	steamApps_init                            func() uintptr
+	steamApps_get                             func() uintptr
 	iSteamApps_BIsSubscribed                  func(steamApps uintptr) bool
 	iSteamApps_BIsLowViolence                 func(steamApps uintptr) bool
 	iSteamApps_BIsCybercafe                   func(steamApps uintptr) bool
@@ -89,7 +89,7 @@ var (
 type steamApps uintptr
 
 func SteamApps() ISteamApps {
-	return steamApps(steamApps_init())
+	return steamApps(steamApps_get())
 }
 
 func (s steamApps) BIsSubscribed() bool {
@@ -473,7 +473,7 @@ const (
 )
 
 var (
-	steamFriends_init                                               func() uintptr
+	steamFriends_get                                                func() uintptr
 	iSteamFriends_GetPersonaName                                    func(steamFriends uintptr) string
 	iSteamFriends_SetPersonaName                                    func(steamFriends uintptr, pchPersonaName string) SteamAPICall
 	iSteamFriends_GetPersonaState                                   func(steamFriends uintptr) EPersonaState
@@ -558,7 +558,7 @@ var (
 type steamFriends uintptr
 
 func SteamFriends() ISteamFriends {
-	return steamFriends(steamFriends_init())
+	return steamFriends(steamFriends_get())
 }
 func (s steamFriends) GetPersonaName() string {
 	return iSteamFriends_GetPersonaName(uintptr(s))
@@ -1063,7 +1063,7 @@ const (
 )
 
 var (
-	steamGameSearch_init                         func() uintptr
+	steamGameSearch_get                          func() uintptr
 	iSteamGameSearch_AddGameSearchParams         func(steamGameSearch uintptr, keyToFind string, valuesToFind string) EGameSearchErrorCode
 	iSteamGameSearch_SearchForGameWithLobby      func(steamGameSearch uintptr, lobbySteamID Uint64SteamID, playerMin int32, playerMax int32) EGameSearchErrorCode
 	iSteamGameSearch_SearchForGameSolo           func(steamGameSearch uintptr, playerMin int32, playerMax int32) EGameSearchErrorCode
@@ -1083,7 +1083,7 @@ var (
 type steamGameSearch uintptr
 
 func SteamGameSearch() ISteamGameSearch {
-	return steamGameSearch(steamGameSearch_init())
+	return steamGameSearch(steamGameSearch_get())
 }
 
 func (s steamGameSearch) AddGameSearchParams(keyToFind string, valuesToFind string) EGameSearchErrorCode {
@@ -1192,7 +1192,7 @@ const (
 )
 
 var (
-	steamGameServer_init                                 func() uintptr
+	steamGameServer_get                                  func() uintptr
 	iSteamGameServer_SetProduct                          func(steamGameServer uintptr, pszProduct string)
 	iSteamGameServer_SetGameDescription                  func(steamGameServer uintptr, pszGameDescription string)
 	iSteamGameServer_SetModDir                           func(steamGameServer uintptr, modDir string)
@@ -1236,7 +1236,7 @@ type steamGameServer uintptr
 
 func SteamGameServer() ISteamGameServer {
 	GameServerActive = true
-	return steamGameServer(steamGameServer_init())
+	return steamGameServer(steamGameServer_get())
 }
 
 func (s steamGameServer) SetProduct(product string) {
@@ -1400,7 +1400,7 @@ func (s steamGameServer) BUpdateUserData(user Uint64SteamID, playerName string, 
 // Steam Game Server Stats
 
 var (
-	steamGameServerStats_init                   func() uintptr
+	steamGameServerStats_get                    func() uintptr
 	iSteamGameServerStats_RequestUserStats      func(steamGameServerStats uintptr, userSteamID Uint64SteamID) SteamAPICall
 	iSteamGameServerStats_GetUserStatInt32      func(steamGameServerStats uintptr, userSteamID Uint64SteamID, name string, pData *int32) bool
 	iSteamGameServerStats_GetUserStatFloat      func(steamGameServerStats uintptr, userSteamID Uint64SteamID, name string, pData *float32) bool
@@ -1430,7 +1430,7 @@ const (
 type steamGameServerStats uintptr
 
 func SteamGameServerStats() ISteamGameServerStats {
-	return steamGameServerStats(steamGameServerStats_init())
+	return steamGameServerStats(steamGameServerStats_get())
 }
 
 func (s steamGameServerStats) RequestUserStats(userSteamID Uint64SteamID) CallResult[GSStatsReceived] {
@@ -2154,7 +2154,7 @@ const (
 )
 
 var (
-	steamInput_init                                  func() uintptr
+	steamInput_get                                   func() uintptr
 	iSteamInput_Init                                 func(steamInput uintptr, explicitlyCallRunFrame bool) bool
 	iSteamInput_Shutdown                             func(steamInput uintptr) bool
 	iSteamInput_SetInputActionManifestFilePath       func(steamInput uintptr, inputActionManifestAbsolutePath string) bool
@@ -2208,7 +2208,7 @@ var (
 type steamInput uintptr
 
 func SteamInput() ISteamInput {
-	return steamInput(steamInput_init())
+	return steamInput(steamInput_get())
 }
 
 func (s steamInput) Init(explicitlyCallRunFrame bool) bool {
@@ -2484,7 +2484,7 @@ const (
 )
 
 var (
-	steamInventory_init                                    func() uintptr
+	steamInventory_get                                     func() uintptr
 	iSteamInventory_GetResultStatus                        func(steamInventory uintptr, resultHandle SteamInventoryResult) EResult
 	iSteamInventory_GetResultItems                         func(steamInventory uintptr, resultHandle SteamInventoryResult, pOutItemsArray []SteamItemDetails, punOutItemsArraySize *uint32) bool
 	iSteamInventory_GetResultItemProperty                  func(steamInventory uintptr, resultHandle SteamInventoryResult, unItemIndex uint32, pchPropertyName string, pchValueBuffer []byte, punValueBufferSizeOut *uint32) bool
@@ -2526,7 +2526,7 @@ var (
 type steamInventory uintptr
 
 func SteamInventory() ISteamInventory {
-	return steamInventory(steamInventory_init())
+	return steamInventory(steamInventory_get())
 }
 
 func (s steamInventory) GetResultStatus(resultHandle SteamInventoryResult) EResult {
@@ -2830,7 +2830,7 @@ const (
 )
 
 var (
-	steamMatchmaking_init                                        func() uintptr
+	steamMatchmaking_get                                         func() uintptr
 	iSteamMatchmaking_GetFavoriteGameCount                       func(steamMatchmaking uintptr) int32
 	iSteamMatchmaking_GetFavoriteGame                            func(steamMatchmaking uintptr, iGame int32, pnAppID *AppId_t, pnIP *uint32, pnConnPort *uint16, pnQueryPort *uint16, punFlags *uint32, pRTime32LastPlayedOnServer *uint32) bool
 	iSteamMatchmaking_AddFavoriteGame                            func(steamMatchmaking uintptr, nAppID AppId_t, nIP uint32, nConnPort uint16, nQueryPort uint16, unFlags uint32, rTime32LastPlayedOnServer uint32) int32
@@ -2874,7 +2874,7 @@ var (
 type steamMatchmaking uintptr
 
 func SteamMatchmaking() ISteamMatchmaking {
-	return steamMatchmaking(steamMatchmaking_init())
+	return steamMatchmaking(steamMatchmaking_get())
 }
 
 func (s steamMatchmaking) GetFavoriteGameCount() int32 {
@@ -3214,7 +3214,7 @@ const (
 )
 
 var (
-	steamMatchmakingServers_init                              func() uintptr
+	steamMatchmakingServers_get                               func() uintptr
 	iSteamMatchmakingServers_RequestInternetServerList        func(steamMatchmakingServers uintptr, iApp AppId_t, ppchFilters *[]MatchMakingKeyValuePair, nFilters uint32, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
 	iSteamMatchmakingServers_RequestLANServerList             func(steamMatchmakingServers uintptr, iApp AppId_t, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
 	iSteamMatchmakingServers_RequestFriendsServerList         func(steamMatchmakingServers uintptr, iApp AppId_t, ppchFilters *[]MatchMakingKeyValuePair, nFilters uint32, pRequestServersResponse *MatchmakingServerListResponse) HServerListRequest
@@ -3248,7 +3248,7 @@ var (
 type steamMatchmakingServers uintptr
 
 func SteamMatchmakingServers() ISteamMatchmakingServers {
-	return steamMatchmakingServers(steamMatchmakingServers_init())
+	return steamMatchmakingServers(steamMatchmakingServers_get())
 }
 
 func (s steamMatchmakingServers) RequestInternetServerList(App AppId_t, FilterCount uint32) (Filters []MatchMakingKeyValuePair, RequestServersResponse MatchmakingServerListResponse, request HServerListRequest) {
@@ -4079,7 +4079,7 @@ const (
 )
 
 var (
-	steamNetworkingMessages_init                      func() uintptr
+	steamNetworkingMessages_get                       func() uintptr
 	iSteamNetworkingMessages_SendMessageToUser        func(steamNetworkingMessages uintptr, identityRemote uintptr, pubData []byte, cubData uint32, nSendFlags int32, nRemoteChannel int32) EResult
 	iSteamNetworkingMessages_ReceiveMessagesOnChannel func(steamNetworkingMessages uintptr, nLocalChannel int32, ppOutMessages *[]SteamNetworkingMessage, nMaxMessages int32) int32
 	iSteamNetworkingMessages_AcceptSessionWithUser    func(steamNetworkingMessages uintptr, identityRemote uintptr) bool
@@ -4091,7 +4091,7 @@ var (
 type steamNetworkingMessages uintptr
 
 func SteamNetworkingMessages() ISteamNetworkingMessages {
-	return steamNetworkingMessages(steamNetworkingMessages_init())
+	return steamNetworkingMessages(steamNetworkingMessages_get())
 }
 
 func (s steamNetworkingMessages) SendMessageToUser(remoteIdentity SteamNetworkingIdentity, Data []byte, SendFlags int32, RemoteChannel int32) EResult {
@@ -4124,7 +4124,7 @@ func (s steamNetworkingMessages) GetSessionConnectionInfo(remoteIdentity SteamNe
 // Steam Networking Sockets
 
 var (
-	steamNetworkingSockets_init                                     func() uintptr
+	steamNetworkingSockets_get                                      func() uintptr
 	iSteamNetworkingSockets_CreateListenSocketIP                    func(steamNetworkingSockets uintptr, localAddress uintptr, nOptions int32, pOptions []SteamNetworkingConfigValue) HSteamListenSocket
 	iSteamNetworkingSockets_ConnectByIPAddress                      func(steamNetworkingSockets uintptr, address uintptr, nOptions int32, pOptions []SteamNetworkingConfigValue) HSteamNetConnection
 	iSteamNetworkingSockets_CreateListenSocketP2P                   func(steamNetworkingSockets uintptr, nLocalVirtualPort int32, nOptions int32, pOptions []SteamNetworkingConfigValue) HSteamListenSocket
@@ -4228,7 +4228,7 @@ const (
 type steamNetworkingSockets uintptr
 
 func SteamNetworkingSockets() ISteamNetworkingSockets {
-	return steamNetworkingSockets(steamNetworkingSockets_init())
+	return steamNetworkingSockets(steamNetworkingSockets_get())
 }
 
 func (s steamNetworkingSockets) CreateListenSocketIP(localAddress SteamNetworkingIPAddr, Options []SteamNetworkingConfigValue) HSteamListenSocket {
@@ -4462,7 +4462,7 @@ type intptr int64
 type size uint64
 
 var (
-	steamNetworkingUtils_init                                                   func() uintptr
+	steamNetworkingUtils_get                                                    func() uintptr
 	iSteamNetworkingUtils_AllocateMessage                                       func(steamNetworkingUtils uintptr, cbAllocateBuffer int32) *SteamNetworkingMessage
 	iSteamNetworkingUtils_InitRelayNetworkAccess                                func(steamNetworkingUtils uintptr)
 	iSteamNetworkingUtils_GetRelayNetworkStatus                                 func(steamNetworkingUtils uintptr, pDetails *SteamRelayNetworkStatus) ESteamNetworkingAvailability
@@ -4554,7 +4554,7 @@ const (
 type steamNetworkingUtils uintptr
 
 func SteamNetworkingUtils() ISteamNetworkingUtils {
-	return steamNetworkingUtils(steamNetworkingUtils_init())
+	return steamNetworkingUtils(steamNetworkingUtils_get())
 }
 
 func (s steamNetworkingUtils) AllocateMessage(AllocateBufferSize int32) *SteamNetworkingMessage {
@@ -4786,7 +4786,7 @@ const (
 )
 
 var (
-	steamParties_init                            func() uintptr
+	steamParties_get                             func() uintptr
 	iSteamParties_GetNumActiveBeacons            func(steamParties uintptr) uint32
 	iSteamParties_GetBeaconByIndex               func(steamParties uintptr, unIndex uint32) PartyBeaconID
 	iSteamParties_GetBeaconDetails               func(steamParties uintptr, ulBeaconID PartyBeaconID, pSteamIDBeaconOwner *CSteamID, pLocation *SteamPartyBeaconLocation, pchMetadata []byte, cchMetadata int32) bool
@@ -4804,7 +4804,7 @@ var (
 type steamParties uintptr
 
 func SteamParties() ISteamParties {
-	return steamParties(steamParties_init())
+	return steamParties(steamParties_get())
 }
 
 func (s steamParties) GetNumActiveBeacons() uint32 {
@@ -4892,7 +4892,7 @@ const (
 )
 
 var (
-	steamRemotePlay_init                           func() uintptr
+	steamRemotePlay_get                            func() uintptr
 	iSteamRemotePlay_GetSessionCount               func(steamRemotePlay uintptr) uint32
 	iSteamRemotePlay_GetSessionID                  func(steamRemotePlay uintptr, iSessionIndex int32) RemotePlaySessionID
 	iSteamRemotePlay_GetSessionSteamID             func(steamRemotePlay uintptr, unSessionID RemotePlaySessionID) Uint64SteamID
@@ -4906,7 +4906,7 @@ var (
 type steamRemotePlay uintptr
 
 func SteamRemotePlay() ISteamRemotePlay {
-	return steamRemotePlay(steamRemotePlay_init())
+	return steamRemotePlay(steamRemotePlay_get())
 }
 
 func (s steamRemotePlay) GetSessionCount() uint32 {
@@ -5140,7 +5140,7 @@ const (
 )
 
 var (
-	steamRemoteStorage_init                                     func() uintptr
+	steamRemoteStorage_get                                      func() uintptr
 	iSteamRemoteStorage_FileWrite                               func(steamRemoteStorage uintptr, pchFile string, pvData []byte, cubData int32) bool
 	iSteamRemoteStorage_FileRead                                func(steamRemoteStorage uintptr, pchFile string, pvData []byte, cubDataToRead int32) int32
 	iSteamRemoteStorage_FileWriteAsync                          func(steamRemoteStorage uintptr, pchFile string, pvData []byte, cubData uint32) SteamAPICall
@@ -5205,7 +5205,7 @@ var (
 type steamRemoteStorage uintptr
 
 func SteamRemoteStorage() ISteamRemoteStorage {
-	return steamRemoteStorage(steamRemoteStorage_init())
+	return steamRemoteStorage(steamRemoteStorage_get())
 }
 
 func (s steamRemoteStorage) FileWrite(File string, Data []byte) bool {
@@ -5517,7 +5517,7 @@ const (
 )
 
 var (
-	steamScreenshots_init                      func() uintptr
+	steamScreenshots_get                       func() uintptr
 	iSteamScreenshots_WriteScreenshot          func(steamScreenshots uintptr, pubRGB []byte, cubRGB uint32, nWidth int32, nHeight int32) ScreenshotHandle
 	iSteamScreenshots_AddScreenshotToLibrary   func(steamScreenshots uintptr, pchFilename string, pchThumbnailFilename string, nWidth int32, nHeight int32) ScreenshotHandle
 	iSteamScreenshots_TriggerScreenshot        func(steamScreenshots uintptr)
@@ -5532,7 +5532,7 @@ var (
 type steamScreenshots uintptr
 
 func SteamScreenshots() ISteamScreenshots {
-	return steamScreenshots(steamScreenshots_init())
+	return steamScreenshots(steamScreenshots_get())
 }
 
 func (s steamScreenshots) WriteScreenshot(pubRGB []byte, nWidth int32, nHeight int32) ScreenshotHandle {
@@ -5843,7 +5843,7 @@ const (
 )
 
 var (
-	steamUGC_init                                 func() uintptr
+	steamUGC_get                                  func() uintptr
 	iSteamUGC_CreateQueryUserUGCRequest           func(steamUGC uintptr, unAccountID AccountID, eListType EUserUGCList, eMatchingUGCType EUGCMatchingUGCType, eSortOrder EUserUGCListSortOrder, nCreatorAppID AppId_t, nConsumerAppID AppId_t, unPage uint32) UGCQueryHandle
 	iSteamUGC_CreateQueryAllUGCRequestPage        func(steamUGC uintptr, eQueryType EUGCQuery, eMatchingeMatchingUGCTypeFileType EUGCMatchingUGCType, nCreatorAppID AppId_t, nConsumerAppID AppId_t, unPage uint32) UGCQueryHandle
 	iSteamUGC_CreateQueryAllUGCRequestCursor      func(steamUGC uintptr, eQueryType EUGCQuery, eMatchingeMatchingUGCTypeFileType EUGCMatchingUGCType, nCreatorAppID AppId_t, nConsumerAppID AppId_t, pchCursor string) UGCQueryHandle
@@ -5942,7 +5942,7 @@ var (
 type steamUGC uintptr
 
 func SteamUGC() ISteamUGC {
-	return steamUGC(steamUGC_init())
+	return steamUGC(steamUGC_get())
 }
 
 func (s steamUGC) CreateQueryUserUGCRequest(accountID AccountID, listType EUserUGCList, matchingUGCType EUGCMatchingUGCType, sortOrder EUserUGCListSortOrder, creatorAppID AppId_t, consumerAppID AppId_t, page uint32) UGCQueryHandle {
@@ -6485,7 +6485,7 @@ const (
 )
 
 var (
-	steamUser_init                            func() uintptr
+	steamUser_get                             func() uintptr
 	iSteamUser_GetHSteamUser                  func(steamUser uintptr) HSteamUser
 	iSteamUser_BLoggedOn                      func(steamUser uintptr) bool
 	iSteamUser_GetSteamID                     func(steamUser uintptr) CSteamID
@@ -6557,7 +6557,7 @@ const (
 type steamUser uintptr
 
 func SteamUser() ISteamUser {
-	return steamUser(steamUser_init())
+	return steamUser(steamUser_get())
 }
 
 func (s steamUser) GetHSteamUser() HSteamUser {
@@ -6806,7 +6806,7 @@ const (
 )
 
 var (
-	steamUserStats_init                                 func() uintptr
+	steamUserStats_get                                  func() uintptr
 	iSteamUserStats_GetStatInt32                        func(steamUserStats uintptr, pchName string, pData *int32) bool
 	iSteamUserStats_GetStatFloat                        func(steamUserStats uintptr, pchName string, pData *float32) bool
 	iSteamUserStats_SetStatInt32                        func(steamUserStats uintptr, pchName string, nData int32) bool
@@ -6856,7 +6856,7 @@ var (
 type steamUserStats uintptr
 
 func SteamUserStats() ISteamUserStats {
-	return steamUserStats(steamUserStats_init())
+	return steamUserStats(steamUserStats_get())
 }
 
 func (s steamUserStats) GetStat(name string) (data int32, success bool) {
@@ -7130,7 +7130,7 @@ const (
 )
 
 var (
-	steamUtils_init                             func() uintptr
+	steamUtils_get                              func() uintptr
 	iSteamUtils_GetSecondsSinceAppActive        func(steamUtils uintptr) uint32
 	iSteamUtils_GetSecondsSinceComputerActive   func(steamUtils uintptr) uint32
 	iSteamUtils_GetConnectedUniverse            func(steamUtils uintptr) EUniverse
@@ -7214,7 +7214,7 @@ const (
 type steamUtils uintptr
 
 func SteamUtils() ISteamUtils {
-	return steamUtils(steamUtils_init())
+	return steamUtils(steamUtils_get())
 }
 
 func (s steamUtils) GetSecondsSinceAppActive() uint32 {

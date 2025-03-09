@@ -9,7 +9,7 @@ type CGameID uint64
 type Uint64SteamID uint64
 type Uint64GameID uint64
 
-var steamAPIDLL uintptr
+var steamAPILib uintptr
 
 type SteamAPIWarningMessageHook string
 type SteamCallbackID uint64
