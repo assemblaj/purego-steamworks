@@ -3484,8 +3484,6 @@ type SteamNetworkingMessage struct {
 	_             [4]byte
 }
 
-type FnSteamRelayNetworkStatusChanged uintptr
-
 type ESteamNetworkingAvailability int32
 
 const (
@@ -3647,11 +3645,12 @@ const (
 	ESteamNetworkingConfig_ValueForce32Bit                               ESteamNetworkingConfigValue = 2147483647
 )
 
-type FnSteamNetConnectionStatusChanged uintptr
-type FnSteamNetAuthenticationStatusChanged uintptr
-type FnSteamNetworkingMessagesSessionRequest uintptr
-type FnSteamNetworkingMessagesSessionFailed uintptr
-type FnSteamNetworkingFakeIPResult uintptr
+type FnSteamNetConnectionStatusChanged func(callbacData *SteamNetConnectionStatusChangedCallback)
+type FnSteamNetAuthenticationStatusChanged func(callbacData *SteamNetAuthenticationStatus)
+type FnSteamRelayNetworkStatusChanged func(callbacData *SteamRelayNetworkStatus)
+type FnSteamNetworkingMessagesSessionRequest func(callbacData *SteamNetworkingMessagesSessionRequest)
+type FnSteamNetworkingMessagesSessionFailed func(callbacData *SteamNetworkingMessagesSessionFailed)
+type FnSteamNetworkingFakeIPResult func(callbacData *SteamNetworkingFakeIPResult)
 
 type ESteamNetworkingConfigScope int32
 

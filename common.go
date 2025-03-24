@@ -11,7 +11,7 @@ type Uint64GameID uint64
 
 var steamAPILib uintptr
 
-type SteamAPIWarningMessageHook string
+type SteamAPIWarningMessageHook func(severity int32, msg string)
 type SteamCallbackID uint64
 
 type lint64 int64
@@ -271,4 +271,30 @@ func structToUintptr[T any](s *T) uintptr {
 
 func bytesToStruct[T any](data []byte) *T {
 	return (*T)(unsafe.Pointer(&data[0]))
+}
+
+func boolToUintptr(b bool) uintptr {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+func boolFromUintptr(u uintptr) bool {
+	return byte(u) != 0
+}
+
+func goString(c uintptr) string {
+	ptr := *(*unsafe.Pointer)(unsafe.Pointer(&c))
+	if ptr == nil {
+		return ""
+	}
+	var length int
+	for {
+		if *(*byte)(unsafe.Add(ptr, uintptr(length))) == '\x00' {
+			break
+		}
+		length++
+	}
+	return string(unsafe.Slice((*byte)(ptr), length))
 }
