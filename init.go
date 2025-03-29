@@ -55,7 +55,7 @@ func initApi() {
 		panic(err)
 	}
 
-	purego.RegisterLibFunc(&restartAppiIfNecessary, steamAPILib, flatAPI_RestartAppIfNecessary)
+	purego.RegisterLibFunc(&restartAppIfNecessary, steamAPILib, flatAPI_RestartAppIfNecessary)
 	purego.RegisterLibFunc(&initFlat, steamAPILib, flatAPI_InitFlat)
 	purego.RegisterLibFunc(&Shutdown, steamAPILib, flatAPI_Shutdown)
 	purego.RegisterLibFunc(&WriteMiniDump, steamAPILib, flatAPI_WriteMiniDump)

@@ -6438,7 +6438,7 @@ const (
 	EAuthSessionResponse_AuthTicketNetworkIdentityFailure EAuthSessionResponse = 10
 )
 
-type HAuthTicket uint
+type HAuthTicket uint32
 
 type EVoiceResult int32
 
