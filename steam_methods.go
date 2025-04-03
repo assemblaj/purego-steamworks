@@ -40,7 +40,7 @@ func (s *steamErrMsg) String() string {
 }
 
 var (
-	restartAppiIfNecessary     func(int) uintptr
+	restartAppIfNecessary      func(int) uintptr
 	initFlat                   func(*steamErrMsg) uintptr
 	Shutdown                   func()
 	WriteMiniDump              func(uStructuredExceptionCode uint32, pvExceptionInfo []byte, uBuildID uint32)
@@ -55,8 +55,8 @@ func SetDebugMode(debugEnabled bool) {
 	debugMode = debugEnabled
 }
 
-func RestartAppiIfNecessary(appID uint32) bool {
-	result := restartAppiIfNecessary(int(appID))
+func RestartAppIfNecessary(appID uint32) bool {
+	result := restartAppIfNecessary(int(appID))
 	return byte(result) != 0
 }
 
